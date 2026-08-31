@@ -13,13 +13,14 @@ sudo apt-get install -y --no-install-recommends \
 
 # Typst 0.15.0 이상 설치 (공식 설치 스크립트 사용)
 if ! command -v typst >/dev/null 2>&1; then
-  curl -fsSL https://typst.community/typst-install/install.sh | sh
+  curl -fsSL https://raw.githubusercontent.com/typst-community/typst-install/main/install.sh | sh
 fi
 
 # PATH 반영 (설치 스크립트 기본 경로)
-if [ -d "$HOME/.local/bin" ] && [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
-  echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
-  export PATH="$HOME/.local/bin:$PATH"
+if [ -d "$HOME/.typst/bin" ] && [[ ":$PATH:" != *":$HOME/.typst/bin:"* ]]; then
+  echo 'export TYPST_INSTALL="$HOME/.typst"' >> "$HOME/.bashrc"
+  echo 'export PATH="$TYPST_INSTALL/bin:$PATH"' >> "$HOME/.bashrc"
+  export PATH="$HOME/.typst/bin:$PATH"
 fi
 
 # typst 버전 체크 (0.15.0 이상 요구)
