@@ -8,7 +8,8 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "myriad-dreamin.tinymist"
+        "myriad-dreamin.tinymist",
+        "mathematic.vscode-pdf"
       ]
     }
   }
