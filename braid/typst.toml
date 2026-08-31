@@ -1,0 +1,22 @@
+[package]
+name = "braid"
+version = "0.1.0"
+entrypoint = "lib.typ"
+authors = ["Ahn, Ki Yung <kyagrd@gmail.com>"]
+license = "MIT"
+description = "Compose, execute, and also reflect output result of literate code snippets of multiple files, possibly in many different programming languages, from a Typst script."
+repository = "https://github.com/kyagrd/braid"
+keywords = ["literate", "code", "snippet", "automation", "typst"]
+categories = ["scripting", "utility", "integration"]
+compiler = "0.15.0"
+
+# Exclude development-only files from package archive.
+exclude = [
+  "/.git/**",
+  "/.github/**",
+  "/_build/**",
+  "/tests/**",
+  "/examples/**",
+  "/*.sublime-syntax",
+  "/files.json",
+]
