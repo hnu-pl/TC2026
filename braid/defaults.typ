@@ -4,7 +4,7 @@
   python: (
     ext: "py",
     join-line-start: "print('" + snippet-break-str + "') # ",
-    interactive: src => "python " + src,
+    interactive: src => "python3 " + src,
     compile: none
   ),
   kotlin: (

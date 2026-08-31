@@ -67,12 +67,40 @@
 
 ////////////////////////////////////////////////////////////////////////////
 
-= First Section
+= 주교재 Ch.0. Introduction
 가나다라
 
 = Second Section
 마바사
 
+#code(file: "hello.pl")[```prolog
+app([], L, L).
+app([H|L1], L2, [H|L]) :- app(L1, L2, L).
+
+?- app(L1, L2, [1,2]),
+   format("L1 = ~w, L2 = ~w~n", [L1, L2]).
+```]
+
+
+#code(file: "hello.pl")[```prolog
+?- findall( (L1,L2), app(L1, L2, [1,2,3]), Bag ),
+   forall( member((L1,L2), Bag),
+           format("L1 = ~w, L2 = ~w~n", [L1, L2]) ).
+```]
+
+
+#code(file: "hello.pl")[```prolog
+?- findnsols( 2,
+              (L1,L2), app(L1, L2, [1,2,3]), Bag ),
+   forall( member((L1,L2), Bag),
+           format("L1 = ~w, L2 = ~w~n", [L1, L2]) ).
+```]
+
+
+
+
 = Third Section
 아자차카
+타파하
+
 
