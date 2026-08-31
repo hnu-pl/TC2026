@@ -12,7 +12,7 @@
 // ==================== 한글 폰트 설정 ====================
 #let font-serif = "Noto Serif CJK KR"
 #let font-sans = "Noto Sans CJK KR"
-#let font-mono = "Hack"
+#let font-mono = "DejaVu Sans Mono"
 
 #set text(font: font-serif, size: 11pt, lang: "ko", region: "KR")
 
