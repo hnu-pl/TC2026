@@ -67,8 +67,154 @@
 
 ////////////////////////////////////////////////////////////////////////////
 
-= 주교재 Ch.0. Introduction
-가나다라
+#heading(level: 1, numbering: none)[주교재 0 Introduction]
+주교재에서 다루는 영역에 대한 개괄적 소개.
+
+주교재에서 설명하면서 필요한 수학적 개념들 미리 정리.
+
+#heading(level: 2, numbering: none)[주교재 0.1 오토마타, 계산가능성, 복잡도]
+
+계산이론(theory of computation)이 다루는 세 가지 영역
+- 오토마톤 / 상태 기계: Automaton / State Machine
+- 계산가능성: Computability - 어떤 문제가 계산으로 정의/해결 가능한지
+- (계산)복잡도: (Computational) Complexity - 계산하기 위해 필요한 자원 소모 정도
+
+참고로 오토마타(Automata)는 오토마톤(Automaton)의 복수형. \
+근데 한국어에서는 귀찮으니 그냥 1개도 오토마타라고 부르는 경우가 많음. \
+영어로 쓸 때는 주의해야 함.
+
+
+계산이론의 이런 모든 분야를 관통하는 핵심 질문: \
+#quote[
+  What are the fundamental capabilities and limits of computation?
+] \
+#quote[
+  계산이라는 절차가 근본적인 역량과 한계는 무엇인가?
+]
+
+즉, 계산이라는 것으로 어디까지는 할 수 있고 어떤 범위에서는 계산이라는 것이 불가능한지 탐구하는 것이 계산이론의 핵심이다.
+
+(계산할 수 있을 거 같은데 ... 안되는 것도 있다는 이야기)
+
+#heading(level: 3, numbering: none)[Complexity Theory 복잡도 이론]
+계산의 난이도를 다루는 이 분야의 핵심 질문: \
+#quote[
+  What makes some problems computationally hard and others easy?
+] \
+#quote[
+  어떤 문제들은 계산적으로 어렵고 다른 문제들은 쉬운 것은 무엇 때문인가?
+]
+
+알고리즘 과목에서 많이 다루는 개념. (근데 일단 계산이 가능한 것들 중에서 ...)
+
+#heading(level: 3, numbering: none)[Computability Theory 계산가능성 이론]
+이 분야의 선구자들: 쿠르트 괴델, 앨런 튜링, 알론조 처치
+
+이 이론을 전개하기 위해서는 계산이 무엇인지 정의해야 함
+
+계산의 모델(model)이라는 것을 정의하는 방식으로 계산이 무엇인지 정의함
+
+#heading(level: 3, numbering: none)[Automata Theory 오토마타 이론]
+계산이 무엇인지 정의하는 한 방식으로 활용됨. 계산의 모델을 명확히 제시해야 계산이 가능한지,
+가능하다면 그 계산이 얼마나 어려운지(필요 시간, 공간 등 자원) 판단 가능.
+
+여러 모델들이 다른 분야에서도 응용됨
+- 유한 오토마타 / 유한 상태 기계: Finite Automata / Finite State Machine \ - 텍스트 처리, 컴파일러에서 어휘 분석, 등등
+- 푸시다운 오토마타 / 스택 오토마타: Pushdown Automata / Stack Automata \ - 언어의 문법 분석, 등등
+
+#heading(level: 2, numbering: none)[주교재 0.2 수학적 표기법과 용어]
+#heading(level: 3, numbering: none)[집합 set]
+집합(set)은 원소/멤버(element/member)들의 모임.
+
+집합의 원소나열법 표기: $S = {7,12,57}$
+
+원소와 집합의 포함 관계 표현: ~ $7 in S$, ~ $8 in.not S$
+
+원소나열법과 생략 기호를 활용한 표기:
+- $cal(N) = {0, 1, 2, ...}$  ~~~~ (자연수의 집합)
+- $cal(Z) = {..., -2, -1, 0, 1, 2, ...}$  ~~ (정수의 집합)
+
+집합의 조건제시법 표기(set-builder notation): $S = {m^2 mid(|) m in cal(N) }$ ~~ (자연수의 집합)
+
+공집합: $emptyset = {}$ ~~ (원소가 하나도 없는 빈 집합)
+
+원소가 딱 1개인 "한원소 집합"(singleton set). ~ 예: ${7}$ ~~ (원소가 7 하나뿐인 집합)
+
+원소가 딱 2개인 집합을 "순서 없는 쌍"(unordered pair) 또는 "집합쌍"이라고 함. \
+예: ${7, 12} = {12, 7}$ ~~ (원소가 7과 12뿐인 집합)
+
+순서쌍(ordered pair, pair, 2-tuple). ~ 예: $(7, 12) eq.not (12, 7)$  ~~ (순서가 중요) \
+일반적으로 $k$-tuple.  예: $(7, 12, 5)$ ~~ (3-tuple)
+
+집합의 연산
+- 교집합(intersection): $A inter B$
+- 합집합(union): $A union B$
+- 여집합(complement): $overline(A) = {x mid(|) x in U, x in.not A}$ ~ 전체집합($U$)이 정의되어 있어야 함
+- 곱집합(cartesian product): $A times B = {(x,y) mid(|) x in A, y in B}$
+- 멱집합(power set): $cal(P)(A) = 2^A = {B mid(|) B subset.eq A}$
+
+집합 3개를 연속해서 곱집합(cartesian product)하면 3-tuple들의 집합이 만들어짐:
+$A times B times C = {(x,y,z) mid(|) x in A, y in B, z in C}$\
+이런 식으로 정의되는 3-tuple에서는 $(a,b,c) = ((a,b),c) = (a,(b,c))$를 동치로 취급함.
+즉, $(A times B) times C = A times (B times C) = A times B times C$ 라는 말.
+하지만, 경우에 따라서는 이걸 구분해서 다루기도 하므로 주의가 필요. 맥락을 잘 살펴야.
+
+벤다이어그램(Venn diagram)은 주교재 그림 참고
+
+집합의 거듭제곱 표기
+- $A^1 = A$
+- $A^2 = A times A$
+- $A^3 = A times A times A$
+- ...
+일반적으로 $A^(k+1) = A times A^k$
+
+그런데 $A^0$ 은 무엇이 되어야 할까? 일단, 공집합($emptyset$)은 안됨!
+
+유한집합의 경우 $A times B$의 크기(원소의 개수)는 각각의 크기(원소의 개수)의 곱. \
+한쪽 크기가 0이면 곱집합의 크기도 0이 됨. 따라서, $A^0$은 한원소 집합이어야 함. \
+근데, 그 한 원소를 뭘로 하지?
+
+$A^0 = {()}$ ~~ (한원소 집합, 그 한 원소는 0-tuple)
+
+
+$A = {a_1, a_2, ...} = {(a_1),(a_2), ...}$
+
+원소 $a_i$ 와 그 원소 하나만으로 이루어진 1-tuple $(a_i)$는 동치로 취급.
+
+$A^0 times A^1 = {()} times {a_1,a_2,...} = {(a_1),(a_2),...}$
+
+#heading(level: 3, numbering: none)[함수와 관계 functions and relations]
+
+함수(function)는 각 원소를 빠짐없이 정확히 하나씩의 원소에 대응시키는 관계.\
+대응되는 대상 자체는 겹쳐도 됨. $x_1 eq.not x_2$ 이더라도 $f(x_1) = f(x_2)$ 일 수 있음.
+\
+이건 안된다. 같은 $x$를 두 번 이상 다른 원소에 대응시키는 것은 안됨.
+$f(x) = y_1 eq.not y_2 = f(x)$ 이러면 $f$는 함수가 아님.
+
+빠지는 게 있어도 안됨. $A = {1,2,3}$일 때 $f: A arrow B$를 순서쌍으로 표현해서\
+$f = {(1,b_1), (3,b_3)}$ ~~ (원소 2가 빠져 있음, 따라서 함수가 아님)\
+이렇게 두 개 조건만 만족하면 부분함수(partial function)라고 부름.\
+이 부분함수에 해당하는 데이터 구조가 딕셔너리(dictionary), 맵(map) 이라고
+데이터구조나 프로그래밍 언어 라이브러리에서 보통 부름.
+
+빠짐없이 정의된 함수 강조해서 전함수(total function)라고도 부름.
+그냥 함수라고 하면 전함수를 뜻함.
+
+함수의 리턴값이 진리값(참 또는 거짓)인 함수를 불리언 함수(boolean function)라고
+부르지만 predicate(술어) 또는 proerty(성질)이라고도 부름B$.
+
+
+그냥 집합 2개 $A$와 $B$ 사이의 관계(relation)는 $A times B$의 부분집합이면 아무거나 됨.
+
+k항 함수(k-ary function): $f: A_1 times A_2 times ... times A_k arrow B$
+넘겨주는 값들의 집합이 $A_1 times A_2 times ... times A_k$로 k개의 곱집합.
+
+k항 관계(k-ary relation): $R subset.eq A_1 times A_2 times ... times A_k$
+총 서로 관계있는 젤 마지막에 있는 것까지 $k$개 곱집합의 부분집합
+
+k항 함수는 (k항 관계의 특별한 경우가 아니고) k+1항 관계의 특별한 경우.
+
+#pagebreak()
 
 = Second Section
 마바사
@@ -122,6 +268,8 @@ mother(X, Y) :- female(X), child(Y, X).
    forall( member((X,Y), Bag),
            format("X = ~w, Y = ~w~n", [X, Y]) ).
 ```]
+
+
 
 
 
