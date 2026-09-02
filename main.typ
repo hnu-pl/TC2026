@@ -93,7 +93,7 @@ app([H|L1], L2, [H|L]) :- app(L1, L2, L).
 ?- findnsols( 2,
               (L1,L2), app(L1, L2, [1,2,3]), Bag ),
    forall( member((L1,L2), Bag),
-           format("L1 = ~w, L2 = ~w~n", [L1, L2]) ).
+           format("L1 = ~w, L2 = ~w~n", [L1, L2]) ). %
 ```]
 
 
@@ -102,6 +102,29 @@ app([H|L1], L2, [H|L]) :- app(L1, L2, L).
 = Third Section
 아자차카
 타파하
+
+#code(file: "another.pl")[```prolog
+child('bob', 'alice').
+child('carol', 'alice').
+child('bob', 'john').
+child('carol', 'john').
+
+male('bob').
+male('john').
+
+female('alice').
+female('carol').
+
+father(X, Y) :- male(X), child(Y, X).
+mother(X, Y) :- female(X), child(Y, X).
+
+?- findall( (X,Y), father(X, Y), Bag ),
+   forall( member((X,Y), Bag),
+           format("X = ~w, Y = ~w~n", [X, Y]) ).
+```]
+
+
+
 
 
 
