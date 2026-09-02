@@ -74,7 +74,61 @@
 #set text(font: font-serif, size: 18pt, lang: "ko", region: "KR")
 #show raw: set text(font: font-mono, size: 14pt, ligatures: false)
 
-////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////
+
+= Prolog 소개
+
+Prolog 코드에서`%`로 시작해 줄 끝까지 부분은 주석(comment)으로 취급됨.
+
+== 가족 관계 예시
+
+#code(file: "family.pl")[```prolog
+% 1항 관계 male    원소나열법 표현
+male('bob').      male('john').     % 원래 한줄에 하나씩 작성을 권장
+% 1항 관계 female  원소나열법 표현
+female('alice').  female('carol').  % 원래 한줄에 하나씩 작성을 권장
+% 2항 관계 child.  원소나열법 표현
+child('bob', 'alice').  child('carol', 'alice').
+child('bob', 'john').   child('carol', 'john').
+% 2항 관계 son     조건제시법 표현
+son(X, Y) :- child(X, Y), male(X).
+
+?- findall( (X,Y), son(X, Y) , Bag ),
+   forall( member((X,Y), Bag), 
+           format("son: X = ~w, Y = ~w~n", [X, Y]) ).
+```]
+
+== 리스트 예시
+하나의 파일 `listapp.pl`을 이렇게 여러 부분의 코드 조각으로
+나누어 작성하는 것도 가능하다.
+
+`app(L1,L2,L)`은 두 리스트 `L1`과 `L2`를 이어붙이면 `L`이 되는 3항 관계
+#code(file: "listapp.pl")[```prolog
+app([], L, L).                             % 빈 리스트와 L을 연결하면 L
+app([H|L1], L2, [H|L]) :- app(L1, L2, L).  % 길이 1이상의 리스트와 L2 연결하는 재귀적 규칙
+
+?- app(L1, L2, [1,2]),                     % 관계를 만족하는 1가지 경우를 찾아서
+   format("L1 = ~w, L2 = ~w~n", [L1, L2]). % 적절한 형식으로 출력
+```]
+
+`app(L1,L2,[1,2])`를 만족하는 모든 경우를 찾으려면 `findall`을 활용해 질의(query)
+#code(file: "listapp.pl")[```prolog
+?- findall( (L1,L2), app(L1, L2, [1,2,3]), Bag ),  % 모든 경우의 집합인 Bag
+   forall( member((L1,L2), Bag),  % 모든 경우를 순회하며 Bag의 원소 [L1,L2]를 하나씩
+           format("L1 = ~w, L2 = ~w~n", [L1, L2]) ).        % 적절한 형식으로 출력
+```]
+
+#pagebreak()
+
+최대 2개까지만 찾으려면 `findsols`를 활용해 질의(query)
+#code(file: "listapp.pl")[```prolog
+?- findnsols( 2, (L1,L2), app(L1, L2, [1,2,3]), Bag ),
+   forall( member((L1,L2), Bag),
+           format("L1 = ~w, L2 = ~w~n", [L1, L2]) ).
+```]
+
+//////////////////////////////////////////////////////////////////
+#pagebreak()
 
 #heading(level: 1, numbering: none)[주교재 0 Introduction]
 주교재에서 다루는 영역에 대한 개괄적 소개.
@@ -245,81 +299,6 @@ $ p(a_1, a_2, ..., a_k) = cases(
       sc("false")     quad (a_1, a_2, ..., a_k) in.not R,
 ) $
 ]
-
-
-
-#pagebreak()
-
-= Prolog 소개
-
-Prolog 코드에서`%`로 시작해 줄 끝까지 부분은 주석(comment)으로 취급됨.
-
-== 가족 관계 예시
-
-#code(file: "family.pl")[```prolog
-% 1항 관계 male    원소나열법 표현
-male('bob').      male('john').     % 원래 한줄에 하나씩 작성을 권장
-% 1항 관계 female  원소나열법 표현
-female('alice').  female('carol').  % 원래 한줄에 하나씩 작성을 권장
-% 2항 관계 child.  원소나열법 표현
-child('bob', 'alice').  child('carol', 'alice').
-child('bob', 'john').   child('carol', 'john').
-% 2항 관계 son     조건제시법 표현
-son(X, Y) :- child(X, Y), male(X).
-
-?- findall( (X,Y), son(X, Y) , Bag ),
-   forall( member((X,Y), Bag), 
-           format("son: X = ~w, Y = ~w~n", [X, Y]) ).
-```]
-
-== 리스트 예시
-하나의 파일 `hello.pl`을 이렇게 여러 부분의 코드 조각으로
-나누어 작성하는 것도 가능하다.
-
-`app(L1,L2,L)`은 두 리스트 `L1`과 `L2`를 이어붙이면 `L`이 되는 3항 관계
-#code(file: "hello.pl")[```prolog
-app([], L, L).                             % 빈 리스트와 L을 연결하면 L
-app([H|L1], L2, [H|L]) :- app(L1, L2, L).  % 길이 1이상의 리스트와 L2 연결하는 재귀적 규칙
-
-?- app(L1, L2, [1,2]),                     % 관계를 만족하는 1가지 경우를 찾아서
-   format("L1 = ~w, L2 = ~w~n", [L1, L2]). % 적절한 형식으로 출력
-```]
-
-`app(L1,L2,[1,2])`를 만족하는 모든 경우를 찾으려면 `findall`을 활용해 질의(query)
-#code(file: "hello.pl")[```prolog
-?- findall( (L1,L2), app(L1, L2, [1,2,3]), Bag ),  % 모든 경우의 집합인 Bag
-   forall( member((L1,L2), Bag),  % 모든 경우를 순회하며 Bag의 원소 [L1,L2]를 하나씩
-           format("L1 = ~w, L2 = ~w~n", [L1, L2]) ).        % 적절한 형식으로 출력
-```]
-
-#pagebreak()
-
-최대 2개까지만 찾으려면 `findsols`를 활용해 질의(query)
-#code(file: "hello.pl")[```prolog
-?- findnsols( 2, (L1,L2), app(L1, L2, [1,2,3]), Bag ),
-   forall( member((L1,L2), Bag),
-           format("L1 = ~w, L2 = ~w~n", [L1, L2]) ).
-```]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
