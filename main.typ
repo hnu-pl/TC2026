@@ -201,7 +201,7 @@ $f = {(1,b_1), (3,b_3)}$ ~~ (원소 2가 빠져 있음, 따라서 함수가 아�
 그냥 함수라고 하면 전함수를 뜻함.
 
 함수의 리턴값이 진리값(참 또는 거짓)인 함수를 불리언 함수(boolean function)라고
-부르지만 predicate(술어) 또는 proerty(성질)이라고도 부름B$.
+부르지만 predicate(술어) 또는 proerty(성질)이라고도 부름.
 
 
 그냥 집합 2개 $A$와 $B$ 사이의 관계(relation)는 $A times B$의 부분집합이면 아무거나 됨.
@@ -210,11 +210,39 @@ k항 함수(k-ary function): $f: A_1 times A_2 times ... times A_k arrow B$
 넘겨주는 값들의 집합이 $A_1 times A_2 times ... times A_k$로 k개의 곱집합.
 
 k항 관계(k-ary relation): $R subset.eq A_1 times A_2 times ... times A_k$
-총 서로 관계있는 젤 마지막에 있는 것까지 $k$개 곱집합의 부분집합
+총 서로 관계있는 젤 마지막에 있는 것까지 k개 곱집합의 부분집합
 
 k항 함수는 (k항 관계의 특별한 경우가 아니고) k+1항 관계의 특별한 경우.
 
 #pagebreak()
+
+= First Section
+프롤로그 프로래램은 이런 식으로 작성됨.
+
+#code(file: "family.pl")[```prolog
+male('bob').
+male('john').
+
+female('alice').
+female('carol').
+
+child('bob', 'alice').
+child('bob', 'john').
+child('carol', 'alice').
+child('carol', 'john').
+
+son(X, Y) :- child(X, Y), male(X).
+daughter(X, Y) :- child(X, Y), female(X).
+
+
+?- findall( (X,Y), son(X, Y) , Bag ),
+   forall( member((X,Y), Bag), 
+           format("son: X = ~w, Y = ~w~n", [X, Y]) ).
+
+?- findall( (X,Y), daughter(X, Y) , Bag ),
+   forall( member((X,Y), Bag), 
+           format("daughter: X = ~w, Y = ~w~n", [X, Y]) ).
+```]
 
 = Second Section
 마바사
@@ -268,6 +296,16 @@ mother(X, Y) :- female(X), child(Y, X).
    forall( member((X,Y), Bag),
            format("X = ~w, Y = ~w~n", [X, Y]) ).
 ```]
+
+
+
+
+
+
+
+
+
+
 
 
 
