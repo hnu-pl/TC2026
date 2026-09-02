@@ -14,7 +14,10 @@
 #let font-sans = "Noto Sans CJK KR"
 #let font-mono = "DejaVu Sans Mono"
 
-#set text(font: font-serif, size: 11pt, lang: "ko", region: "KR")
+#let sc(body) = text(
+  font: "Libertinus Serif",
+  features: ("smcp",)
+)[#body]
 
 // #set heading(numbering: "1.", depth: 3) // 이건 ilm 없을 때
 #show heading: set text(font: font-serif)
@@ -50,6 +53,10 @@
 #(braid.init)()
 
 
+#set page(paper: "a4", flipped: true, margin: (x: 1.5cm, y: 1.2cm))
+#set text(font: font-serif, size: 18pt, lang: "ko", region: "KR")
+#show raw: set text(font: font-mono, size: 14pt, ligatures: false)
+
 #show: ilm.with(
   title: [
     #text(size: 24pt)[Theory of Computation @ HNU CE (2026년 2학기)]
@@ -58,12 +65,14 @@
   date-format: "[year]-[month]-[day]",
   date: datetime.today(),
   abstract: none,
-  table-of-contents: none,
+  // table-of-contents: none,
   raw-text: (font: font-mono, size: 10.5pt, ligatures: false),
   chapter-pagebreak: false,
 )
 
-#show raw: set text(font: font-mono, size: 10.5pt, ligatures: false)
+#set page(paper: "a4", flipped: true, margin: (x: 1.5cm, y: 1.2cm))
+#set text(font: font-serif, size: 18pt, lang: "ko", region: "KR")
+#show raw: set text(font: font-mono, size: 14pt, ligatures: false)
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -174,31 +183,37 @@ $A times B times C = {(x,y,z) mid(|) x in A, y in B, z in C}$\
 한쪽 크기가 0이면 곱집합의 크기도 0이 됨. 따라서, $A^0$은 한원소 집합이어야 함. \
 근데, 그 한 원소를 뭘로 하지?
 
-$A^0 = {()}$ ~~ (한원소 집합, 그 한 원소는 0-tuple)
+$A^0 = {()}$ ~~ (한원소 집합, 그 한 원소 $()$는 0-tuple)
 
 
 $A = {a_1, a_2, ...} = {(a_1),(a_2), ...}$
 
-원소 $a_i$ 와 그 원소 하나만으로 이루어진 1-tuple $(a_i)$는 동치로 취급.
+원소 $a_i$ 와 그 원소 하나만으로 이루어진 1-tuple $(a_i)$는 동치로 취급.\
+또한 $((),a_i) = (a_i) = (a_i,())$ 이것들도 모두 동치로 취급.
 
 $A^0 times A^1 = {()} times {a_1,a_2,...} = {(a_1),(a_2),...}$
 
 #heading(level: 3, numbering: none)[함수와 관계 functions and relations]
 
-함수(function)는 각 원소를 빠짐없이 정확히 하나씩의 원소에 대응시키는 관계.\
+함수(function)는 각 원소를 빠짐없이 정확히 하나씩의 원소에 일대일로 대응시키는 관계.\
 대응되는 대상 자체는 겹쳐도 됨. $x_1 eq.not x_2$ 이더라도 $f(x_1) = f(x_2)$ 일 수 있음.
-\
-이건 안된다. 같은 $x$를 두 번 이상 다른 원소에 대응시키는 것은 안됨.
-$f(x) = y_1 eq.not y_2 = f(x)$ 이러면 $f$는 함수가 아님.
 
-빠지는 게 있어도 안됨. $A = {1,2,3}$일 때 $f: A arrow B$를 순서쌍으로 표현해서\
-$f = {(1,b_1), (3,b_3)}$ ~~ (원소 2가 빠져 있음, 따라서 함수가 아님)\
-이렇게 두 개 조건만 만족하면 부분함수(partial function)라고 부름.\
-이 부분함수에 해당하는 데이터 구조가 딕셔너리(dictionary), 맵(map) 이라고
-데이터구조나 프로그래밍 언어 라이브러리에서 보통 부름.
+같은 $x$를 서로 다른 원소에 대응시키면 안 됨.
+$f(x) = y_1 eq.not y_2 = f(x)$ 이면 $f$는 함수가 아님.
 
-빠짐없이 정의된 함수 강조해서 전함수(total function)라고도 부름.
-그냥 함수라고 하면 전함수를 뜻함.
+빠지는 게 있어도 안됨. $A = {1,2,3}$일 때, 함수 $f: A arrow B$를
+순서쌍의 집합으로 표현했을 때\
+$f = {(1,b_1), (3,b_3)}$ 인 경우 함수가 아님. (원소 2가 대응 안됨) \
+이렇게 일대일 조건을 만족하면 부분함수(partial function).
+이런 부분함수에 해당하는 구조를 데이터구조 이론이나
+프로그래밍언어 라이브러리에서 딕셔너리(dictionary) 또는 맵(map)이라는
+이름으로 부름.
+
+
+빠짐없이 대응이 정의된 함수를 전함수(total function)라고도 부름.
+그냥 함수라고 하면 전함수를 뜻함. 참고로 전함수도 부분함수임.
+일대일 조건을 만족하는 게 부분함수의 정의이므로, 다른 조건을 좀더
+만족한다고 해서 정의상 부분함수가 아니게 되는 것은 아니다.
 
 함수의 리턴값이 진리값(참 또는 거짓)인 함수를 불리언 함수(boolean function)라고
 부르지만 predicate(술어) 또는 proerty(성질)이라고도 부름.
@@ -206,96 +221,87 @@ $f = {(1,b_1), (3,b_3)}$ ~~ (원소 2가 빠져 있음, 따라서 함수가 아�
 
 그냥 집합 2개 $A$와 $B$ 사이의 관계(relation)는 $A times B$의 부분집합이면 아무거나 됨.
 
-k항 함수(k-ary function): $f: A_1 times A_2 times ... times A_k arrow B$
-넘겨주는 값들의 집합이 $A_1 times A_2 times ... times A_k$로 k개의 곱집합.
+함수와 관계의 항수(arity)
+- $k$항 함수($k$-ary function) $f: A_1 times A_2 times ... times A_k arrow B$에
+  넘겨주는 값들의 집합이 \ $A_1 times A_2 times ... times A_k$로 $k$개의 곱집합.
+  마지막 공역(codomain) $B$는 항수를 따질 때 포함 안됨.
+- $k$항 관계($k$-ary relation) $R subset.eq A_1 times A_2 times ... times A_k$은
+  마지막까지 총 $k$개 곱집합의 부분집합
 
-k항 관계(k-ary relation): $R subset.eq A_1 times A_2 times ... times A_k$
-총 서로 관계있는 젤 마지막에 있는 것까지 k개 곱집합의 부분집합
+$k$항 함수는 ($k$항 관계가 아니라) $k+1$항 관계의 특별한 경우.
 
-k항 함수는 (k항 관계의 특별한 경우가 아니고) k+1항 관계의 특별한 경우.
+헷갈리지 않도록 주의!!!
+$k$항 관계인지 검사하는 함수(즉, predicate / property)의 항수는 $k$다.
+주어진 $k$-tuple이
+$k$항 관계 $R subset.eq A_1 times A_2 times ... times A_k$를 만족하나
+검사(즉, 진리값을 리턴)하는 함수
+$p: A_1 times A_2 times ... times A_k arrow cal(B)$의 정의는 다음과 같다.
+(단, $cal(B) = {sc("true"), sc("false")}$)
+
+#[
+#set math.equation(numbering: none)
+$ p(a_1, a_2, ..., a_k) = cases(
+      sc("true") thin quad (a_1, a_2, ..., a_k) in R,
+      sc("false")     quad (a_1, a_2, ..., a_k) in.not R,
+) $
+]
+
+
 
 #pagebreak()
 
-= First Section
-프롤로그 프로래램은 이런 식으로 작성됨.
+= Prolog 소개
+
+Prolog 코드에서`%`로 시작해 줄 끝까지 부분은 주석(comment)으로 취급됨.
+
+== 가족 관계 예시
 
 #code(file: "family.pl")[```prolog
-male('bob').
-male('john').
-
-female('alice').
-female('carol').
-
-child('bob', 'alice').
-child('bob', 'john').
-child('carol', 'alice').
-child('carol', 'john').
-
+% 1항 관계 male    원소나열법 표현
+male('bob').      male('john').     % 원래 한줄에 하나씩 작성을 권장
+% 1항 관계 female  원소나열법 표현
+female('alice').  female('carol').  % 원래 한줄에 하나씩 작성을 권장
+% 2항 관계 child.  원소나열법 표현
+child('bob', 'alice').  child('carol', 'alice').
+child('bob', 'john').   child('carol', 'john').
+% 2항 관계 son     조건제시법 표현
 son(X, Y) :- child(X, Y), male(X).
-daughter(X, Y) :- child(X, Y), female(X).
-
 
 ?- findall( (X,Y), son(X, Y) , Bag ),
    forall( member((X,Y), Bag), 
            format("son: X = ~w, Y = ~w~n", [X, Y]) ).
-
-?- findall( (X,Y), daughter(X, Y) , Bag ),
-   forall( member((X,Y), Bag), 
-           format("daughter: X = ~w, Y = ~w~n", [X, Y]) ).
 ```]
 
-= Second Section
-마바사
+== 리스트 예시
+하나의 파일 `hello.pl`을 이렇게 여러 부분의 코드 조각으로
+나누어 작성하는 것도 가능하다.
 
+`app(L1,L2,L)`은 두 리스트 `L1`과 `L2`를 이어붙이면 `L`이 되는 3항 관계
 #code(file: "hello.pl")[```prolog
-app([], L, L).
-app([H|L1], L2, [H|L]) :- app(L1, L2, L).
+app([], L, L).                             % 빈 리스트와 L을 연결하면 L
+app([H|L1], L2, [H|L]) :- app(L1, L2, L).  % 길이 1이상의 리스트와 L2 연결하는 재귀적 규칙
 
-?- app(L1, L2, [1,2]),
-   format("L1 = ~w, L2 = ~w~n", [L1, L2]).
+?- app(L1, L2, [1,2]),                     % 관계를 만족하는 1가지 경우를 찾아서
+   format("L1 = ~w, L2 = ~w~n", [L1, L2]). % 적절한 형식으로 출력
 ```]
 
-
+`app(L1,L2,[1,2])`를 만족하는 모든 경우를 찾으려면 `findall`을 활용해 질의(query)
 #code(file: "hello.pl")[```prolog
-?- findall( (L1,L2), app(L1, L2, [1,2,3]), Bag ),
+?- findall( (L1,L2), app(L1, L2, [1,2,3]), Bag ),  % 모든 경우의 집합인 Bag
+   forall( member((L1,L2), Bag),  % 모든 경우를 순회하며 Bag의 원소 [L1,L2]를 하나씩
+           format("L1 = ~w, L2 = ~w~n", [L1, L2]) ).        % 적절한 형식으로 출력
+```]
+
+#pagebreak()
+
+최대 2개까지만 찾으려면 `findsols`를 활용해 질의(query)
+#code(file: "hello.pl")[```prolog
+?- findnsols( 2, (L1,L2), app(L1, L2, [1,2,3]), Bag ),
    forall( member((L1,L2), Bag),
            format("L1 = ~w, L2 = ~w~n", [L1, L2]) ).
 ```]
 
 
-#code(file: "hello.pl")[```prolog
-?- findnsols( 2,
-              (L1,L2), app(L1, L2, [1,2,3]), Bag ),
-   forall( member((L1,L2), Bag),
-           format("L1 = ~w, L2 = ~w~n", [L1, L2]) ). %
-```]
-
-
-
-
-= Third Section
-아자차카
-타파하
-
-#code(file: "another.pl")[```prolog
-child('bob', 'alice').
-child('carol', 'alice').
-child('bob', 'john').
-child('carol', 'john').
-
-male('bob').
-male('john').
-
-female('alice').
-female('carol').
-
-father(X, Y) :- male(X), child(Y, X).
-mother(X, Y) :- female(X), child(Y, X).
-
-?- findall( (X,Y), father(X, Y), Bag ),
-   forall( member((X,Y), Bag),
-           format("X = ~w, Y = ~w~n", [X, Y]) ).
-```]
 
 
 
