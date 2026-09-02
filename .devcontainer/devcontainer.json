@@ -9,7 +9,7 @@
     "vscode": {
       "extensions": [
         "myriad-dreamin.tinymist",
-        "mathematic.vscode-pdf"
+        "mupdf.mupdf-vscode"
       ]
     }
   }
