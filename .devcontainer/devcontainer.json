@@ -2,14 +2,15 @@
   "name": "TC2026 Dev Container",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
-    "ghcr.io/devcontainers/features/common-utils:2": {}
+    "ghcr.io/devcontainers/features/common-utils:2": {},
+    "ghcr.io/devcontainers/features/python:1": {}
   },
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "customizations": {
     "vscode": {
       "extensions": [
         "myriad-dreamin.tinymist",
-        "mupdf.mupdf-vscode"
+        "mathematic.vscode-pdf"
       ]
     }
   }
