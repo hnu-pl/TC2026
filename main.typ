@@ -526,6 +526,18 @@ $ p(a_1, a_2, ..., a_k) = cases(
 ]
 
 
+#heading(level: 2, numbering: none)[관계의 표기법]
+관계 $R subset.eq A times B$에서 일반적으로는
+- $(a,b) in R$이면 $R(a,b)$로 표기
+- $(a,b) in.not R$이면 $not R(a,b)$로 표기
+
+위의 표기법은 항수에 관계없이 활용 가능
+
+특별히 항수(arity)가 2인, 즉 이항 관계(binary relation)일 때는\
+중위(infix) 표기법도 활용 가능함
+- $(a,b) in R$이면 $a thin R thin b$로 표기
+- $(a,b) in.not R$이면 $not(a thin R thin b)$
+  또는 $a thin #math.class("relation", $R\u{0338}$) thin b$ 등으로 표기
 
 
 
