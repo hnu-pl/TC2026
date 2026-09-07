@@ -19,6 +19,10 @@
   features: ("smcp",)
 )[#body]
 
+#let uline(w) = box(baseline: 0pt)[#line(length: w, stroke: 0.7pt)]
+
+#let mathit(word) = text(font: "New Computer Modern", style: "italic")[#word]
+
 // #set heading(numbering: "1.", depth: 3) // 이건 ilm 없을 때
 #show heading: set text(font: font-serif)
 
@@ -53,7 +57,7 @@
 #(braid.init)()
 
 
-#set page(paper: "a4", flipped: true, margin: (x: 1.5cm, y: 1.2cm))
+#set page(paper: "a4", flipped: false, margin: (x: 1.5cm, y: 1.2cm))
 #set text(font: font-serif, size: 18pt, lang: "ko", region: "KR")
 #show raw: set text(font: font-mono, size: 14pt, ligatures: false)
 
@@ -70,11 +74,62 @@
   chapter-pagebreak: false,
 )
 
+#set page(paper: "a4", flipped: false, margin: (x: 1.5cm, y: 1.2cm))
+#set text(font: font-serif, size: 12pt, lang: "ko", region: "KR")
+#show raw: set text(font: font-mono, size: 10.5pt, ligatures: false)
+
+
+///////////////////////////////////////////////////////////////////
+#heading(level: 1, numbering: none)[HW01 함수(function)와 관계(relation)의 항수(arity)]
+- 이름: 
+- 학번: 
+#v(0.5em)
+#heading(level: 2, numbering: none)[주교재 Example 0.9]
+예제(Example)의 2항 함수(binary function)
+$g: cal(Z)_4 times cal(Z)_4 arrow cal(Z)_4$에 해당하는 \
+관계(relation)를 `g`를 정의한다면 그 관계의 항수는 얼마일지 생각해 보고, \
+이 관계 `g`를 Prolog 술어(predicate)로 정의하여 두 개 이상의 쿼리를 작성해 보라.
+
+(1) `g`의 항수(arity)는? $quad$ 답: #uline(5em)
+
+(2) 관계 정의 코드와 쿼리를 아래에 작성하고 문서를 make로 빌드하여 실행 결과 확인.
+#code(file: "TC26hw01.pl")[```prolog
+% 여기에 g(...). 코드 작성
+
+?- true,                    % 이 줄의 true 대신 적절한 첫째 쿼리 작성
+   format('~w ~w!~n', ['1st','result']). % 적절한 형식으로 결과 출력
+?- true,                    % 이 줄의 true 대신 적절한 첫째 쿼리 작성
+   format('~w ~w!~n', ['2nd','result']). % 적절한 형식으로 결과 출력
+```]
+
+#pagebreak()
+- 이름: 
+- 학번: 
+#heading(level: 2, numbering: none)[주교재 Example 0.10]
+예제(Example)의 판별 함수(조건 함수, predicate, property)
+#mathit("beats")에 해당하는 \
+관계 `beats`를 정의한다면 그 관계의 항수는 얼마일지 생각해 보고, \ 
+마찬가지로 `beats`를 Prolog로 정의하여 두 개 이상의 쿼리를 작성해 보라.
+
+(1) `beats`의 항수(arity)는? $quad$ 답: #uline(5em)
+
+(2) 관계 정의 코드와 쿼리를 아래에 작성하고 문서를 make로 빌드하여 실행 결과 확인.
+#code(file: "TC26hw01.pl")[```prolog
+% 여기에 beats(...). 코드 작성
+% 단, Prolog에서 대문자는 변수로 취급되므로
+% scissors, paper, stone 이렇게 소문자로 코드에 작성할 것
+
+?- true,                    % 이 줄의 true 대신 적절한 첫째 쿼리 작성
+   format('~w ~w!~n', ['1st','result']). % 적절한 형식으로 결과 출력
+?- true,                    % 이 줄의 true 대신 적절한 첫째 쿼리 작성
+   format('~w ~w!~n', ['2nd','result']). % 적절한 형식으로 결과 출력
+```]
+
+///////////////////////////////////////////////////////////////////
 #set page(paper: "a4", flipped: true, margin: (x: 1.5cm, y: 1.2cm))
 #set text(font: font-serif, size: 18pt, lang: "ko", region: "KR")
 #show raw: set text(font: font-mono, size: 14pt, ligatures: false)
-
-///////////////////////////////////////////////////////////////////
+#pagebreak()
 
 = Prolog 소개
 
@@ -98,34 +153,204 @@ son(X, Y) :- child(X, Y), male(X).
            format("son: X = ~w, Y = ~w~n", [X, Y]) ).
 ```]
 
-== 리스트 예시
-하나의 파일 `listapp.pl`을 이렇게 여러 부분의 코드 조각으로
+#pagebreak()
+== 리스트 기초, 출력을 위한 술어, 연결자(connective) 우선순위
+Prolog에서 리스트(list)는
+- 길이 0인 빈 리스트는 `[]`로 표현
+- `[1,2,3]`처럼 쉼표(`,`)로 구분하여 나열한 원소를 대괄호(`[`와 `]`)로 감싸서 표현
+- `[H|T]`처럼 하나의 원소(`H`, 머리)와 나머지 리스트(`T`, 꼬리)로 나누어 표현
+
+```
+                                             /`\          
+    [ 1,  2,  3       ] =                   1   `\        
+    [ 1| [2,  3     ] ] =                        /`\      
+    [ 1| [2| [3   ] ] ] =                       2   `\    
+    [ 1| [2| [3|[]] ] ]                              /`\  
+                                                    3  [] 
+```
+
+실제로 `write` 술어(predicate)로 출력해 보면 똑같다.
+#code(file: "listbasic.pl")[```prolog
+?- L = [ 1,  2,  3       ], write(L), nl.
+?- L = [ 1| [2,  3     ] ], write(L), nl.
+?- L = [ 1| [2| [3   ] ] ], write(L), nl.
+?- L = [ 1| [2| [3|[]] ] ], write(L), nl.
+```]
+
+Prolog에서는 `조건 -> 참인_경우 ; 거짓인_경우` 형태로 if-then-else를 표현 가능
+#code(file: "listbasic.pl")[```prolog
+?- [1,2,3] = [1,[2,3]]  -> (write(true), nl) ; (write(false), nl).
+?- [1,2,3] = [1|[2,3]]  -> (write(true), nl) ; (write(false), nl).
+```]
+
+and 연결자(`,`)의 우선순위가 if 연결자(`->`)와 or 연결자(`;`)보다 높으므로 괄호 생략 가능
+#code(file: "listbasic.pl")[```prolog
+?- [1,2,3] = [1,[2,3]]  ->  write(true), nl  ;  write(false), nl .
+?- [1,2,3] = [1|[2,3]]  ->  write(true), nl  ;  write(false), nl .
+```]
+
+하나의 파일 `listbasic.pl`을 이렇게 여러 부분의 코드 조각으로
 나누어 작성하는 것도 가능하다.
+
+좀 더 복잡한 형식의 출력은 C의 printf와 비슷한 `format` 술어를 활용
+#code(file: "listbasic.pl")[```prolog
+?- L1 = [1], L2 = [2,3], format("L1 = ~w, L2 = ~w", [L1,L2]).
+```]
+
+#pagebreak()
+== 리스트 연결 예시
 
 `app(L1,L2,L)`은 두 리스트 `L1`과 `L2`를 이어붙이면 `L`이 되는 3항 관계
 #code(file: "listapp.pl")[```prolog
 app([], L, L).                             % 빈 리스트와 L을 연결하면 L
 app([H|L1], L2, [H|L]) :- app(L1, L2, L).  % 길이 1이상의 리스트와 L2 연결하는 재귀적 규칙
 
-?- app(L1, L2, [1,2]),                     % 관계를 만족하는 1가지 경우를 찾아서
+?- app([1], [2,3], L),       % 관계를 만족하는 L을 탐색
+   format("L = ~w~n", [L]).  % L을 적절한 형식으로 출력
+```]
+
+원래 `app`을 정의할 때 생각했던 것과 반대 방향으로도 활용 가능! \
+- `L1`과 `L2`를 연결해 `L`이 되는 관계를 생각하고 정의했는데 ... \
+- 반대로 `L`을 `L1`과 `L2`로 나누는 방법도 탐색 가능!!!
+(참고로, 이런 반대 방향 탐색이 모든 정의에 대해 항상 잘 되는 것은 아님)
+
+#code(file: "listapp.pl")[```prolog
+?- app(L1, L2, [1,2,3]),      % 관계를 만족하는 1가지 경우를 찾아서
    format("L1 = ~w, L2 = ~w~n", [L1, L2]). % 적절한 형식으로 출력
 ```]
 
-`app(L1,L2,[1,2])`를 만족하는 모든 경우를 찾으려면 `findall`을 활용해 질의(query)
+길이 0인 `L1`인 당연한 경우만 탐색되어 실망했다면 ... 다음 페이지를 보라
+
+#pagebreak()
+`app(L1,L2,[1,2,3])`를 만족하는 모든 경우를 탐색하려면 `findall`을 활용해 질의(query)
 #code(file: "listapp.pl")[```prolog
-?- findall( (L1,L2), app(L1, L2, [1,2,3]), Bag ),  % 모든 경우의 집합인 Bag
+?- findall( (L1,L2), app(L1, L2, [1,2,3]), Bag ),  % 모든 경우의 집합 Bag
    forall( member((L1,L2), Bag),  % 모든 경우를 순회하며 Bag의 원소 [L1,L2]를 하나씩
            format("L1 = ~w, L2 = ~w~n", [L1, L2]) ).        % 적절한 형식으로 출력
 ```]
 
-#pagebreak()
-
-최대 2개까지만 찾으려면 `findsols`를 활용해 질의(query)
+최대 몇 개까지만 찾으려면 `findsols`를 활용해 질의(query)
 #code(file: "listapp.pl")[```prolog
-?- findnsols( 2, (L1,L2), app(L1, L2, [1,2,3]), Bag ),
+?- findnsols( 2,  % 최대 2개까지만 만족하는 해를 찾기
+              (L1,L2), app(L1, L2, [1,2,3]), Bag ),
    forall( member((L1,L2), Bag),
            format("L1 = ~w, L2 = ~w~n", [L1, L2]) ).
 ```]
+
+#pagebreak()
+== 사실(fact), 규칙(rule), 절(clause), 술어(predicate)
+
+술어(predicate)
+- 일반적으로 관계(relation)를 정의함
+- 하나 이상의 절(clause)로 구성됨
+
+절(clause)은 다음 두 형태 중 하나
+- 사실(fact)
+  - 머리(head) 부분 다음에 `:-` 없이 `.`으로 끝나는 형태
+  - 머리 부분이 나타내는 성질이 아무런 조건 없이 항상 참
+- 규칙(rule)
+  - 머리(head) 부분 다음 `:-`와 몸체(body) 부분이 오고 `.`로 끝나는 형태
+  - 머리 부분이 나타내는 성질이 특정 조건(즉, 몸체가 나타내는 성질)이 성립할 때만 참
+
+```prolog
+%% 사실들만으로 정의된 술어 male
+male(bob).
+male(john).
+%% 규칙 하나로만 정의된 술어 father
+father(X) :- child(C,X), male(X).    % 자녀가 있고 남자인 조건이 성립해야 아버지로 인정
+
+%% 사실과 규칙 각각 하나씩 2개의 절로 정의된 술어 is_list
+is_list([]).                  % 사실(fact): []는 무조건 리스트로 인정
+is_list([H|T]) :- is_list(T). % 규칙(rule): [H|T]는 is_list(T)가 성립해야 리스트로 인정
+```
+
+사실(fact)을 똑같은 의미의 규칙(rule) 형태로 바꿔 쓰려면 \
+머리 다음에 바로 `.`으로 끝내는 대신 뒤에 `:- true.`라고 쓰면 됨.
+
+```prolog
+male(bob)  :- true.  % male(bob). 과 똑같은 의미
+make(jonh) :- true.  % male(bob). 과 똑같은 의미
+```
+
+왜냐하면 `true`는 무조건 참으로 Prolog에서 미리 정의된 특별한 술어이기 때문.
+
+~
+
+Prolog의 규칙 형태의 절 $C$ `:-` $P_1$`,` $P_2$`,` ... `,` $P_n$`.` 는
+#v(5mm)
+추론규칙
+$display(frac(P_1 quad P_2 quad ... quad P_n, C))$ 혹은
+논리식 
+$P_1 and P_2 and ... and P_n ==> C$ 에 해당한다. 
+
+
+#pagebreak()
+== 항(term)과 일치화(unification)
+
+~
+
+=== 항(term)
+Prolog에서 술어(predicate)가 뭔가 실행되어 움직이는 동적인 무언가라면, \
+항(term)은 정적인 데이터에 해당한다.
+
+항(term)은 다음 셋 중 하나의 형태
+- 변수(variable): `X`, `Y1` 처럼 대문자로 시작
+- 상수(constant)
+  - atom: `a`, `b1`처럼 소문자로 시작하거나 `'Hello World'` 처럼 따옴표로 둘러싸인 것
+  - number: `123`같은 정수나 `3.14`같은 실수
+- compound term / structure: `f(t1, ...)`
+  - 여기서 `f`는 함수자(functor) / 함수 기호(function symbol)
+  - 여기서 `t1`, ... 등등은 항(term)
+
+
+functor의 항수(arity)
+- `f(t1,t2)`에서 `f`의 항수는 2
+- `f(t1,t2,t3)`에서 `f`의 항수는 3
+프로그램 코드에서는 같은 `f`지만
+Prolog 내부적으로 전자는 `f/2`, 후자는 `f/3`와 같이 처리해
+위의 두 `f`를 서로 다른 functor로 확실히 구분함!!!
+(`g`, `h`, `f1`, `f4`처럼 이름이 다른 경우나 마찬가지)
+
+
+=== 일치화(unification)
+
+일치화(unification)란 두 항(term)을 서로 동일하게 만들 수 있는지 판단하는 과정이다.
+그 과정에서 필요하다면 변수를 항으로 치환(substitute)함으로써
+(혹은, 변수에 항을 대입함으로써) 두 항을 동일하게 만든다.
+
+변수가 없는 경우에는 단순히 판단하기만 하면 됨
+#code(file: "unification.pl")[```prolog
+?- a = 3 -> write(true), nl ; write(false), nl.
+?- a = a -> write(true), nl ; write(false), nl.
+```]
+
+#code(file: "unification.pl")[```prolog
+?- f(1,3) = g(1,3) -> write(true), nl ; write(false), nl.
+?- f(1,a) = f(1,3) -> write(true), nl ; write(false), nl.
+?- f(1,3) = f(1,3) -> write(true), nl ; write(false), nl.
+```]
+
+#pagebreak()
+변수에 무엇을 대입해도 일치화할 수 없는 경우들
+#code(file: "unification.pl")[```prolog
+?- f(1,a) = f(X,3) -> format('success: X = ~w~n', [X])
+                    ; format("failure~n").
+?- f(1,Y) = g(X,3) -> format('success: X = ~w, Y = ~w~n', [X,Y])
+                    ; format("failure~n").
+```]
+
+변수를 적절히 치환하여 일치화에 성공하는 경우들
+#code(file: "unification.pl")[```prolog
+?- f(1,3) = f(X,3) -> format('success: X = ~w~n', [X])
+                    ; format("failure~n").
+?- f(1,Y) = f(X,3) -> format('success: X = ~w, Y = ~w~n', [X,Y])
+                    ; format("failure~n").
+```]
+
+살펴본 바와 같이 Prolog는 항(term)에 대한 일치화(unification) 알고리즘을
+자체적으로 내장하고 있으므로, Prolog에서 제공하는 두 항의 일치화 기능을
+위헤 제공하는 특수한 2항 술어(predicate)인 `=`를 사용하기만 하면 됨.
+
 
 //////////////////////////////////////////////////////////////////
 #pagebreak()
@@ -299,6 +524,37 @@ $ p(a_1, a_2, ..., a_k) = cases(
       sc("false")     quad (a_1, a_2, ..., a_k) in.not R,
 ) $
 ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
