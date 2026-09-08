@@ -7,6 +7,7 @@
 // modified few lines from above with same highlighting (no actual syntax modification)
 #set raw(syntaxes: "Prolog.sublime-syntax")
 
+#import "@preview/presio:0.1.0": *
 #import "@preview/ilm:2.1.1": *
 
 // ==================== 한글 폰트 설정 ====================
@@ -21,8 +22,9 @@
 
 #let uline(w) = box(baseline: 0pt)[#line(length: w, stroke: 0.7pt)]
 
-#let mathit(word) = text(font: "New Computer Modern", style: "italic")[#word]
 
+#let mathit(word) = text(font: "New Computer Modern", style: "italic")[#word]
+#let mathtt(word) = text(font: font-mono, size: 0.85em)[#word]
 // #set heading(numbering: "1.", depth: 3) // 이건 ilm 없을 때
 #show heading: set text(font: font-serif)
 
@@ -139,12 +141,12 @@ Prolog 코드에서`%`로 시작해 줄 끝까지 부분은 주석(comment)으�
 
 #code(file: "family.pl")[```prolog
 % 1항 관계 male    원소나열법 표현
-male('bob').      male('john').     % 원래 한줄에 하나씩 작성을 권장
+male(bob).      male(john).     % 원래 한줄에 하나씩 작성을 권장
 % 1항 관계 female  원소나열법 표현
-female('alice').  female('carol').  % 원래 한줄에 하나씩 작성을 권장
+female(alice).  female(carol).  % 원래 한줄에 하나씩 작성을 권장
 % 2항 관계 child.  원소나열법 표현
-child('bob', 'alice').  child('carol', 'alice').
-child('bob', 'john').   child('carol', 'john').
+child(bob, alice).  child(carol, alice).
+child(bob, john).   child(carol, john).
 % 2항 관계 son     조건제시법 표현
 son(X, Y) :- child(X, Y), male(X).
 
@@ -269,7 +271,7 @@ is_list([H|T]) :- is_list(T). % 규칙(rule): [H|T]는 is_list(T)가 성립해�
 
 ```prolog
 male(bob)  :- true.  % male(bob). 과 똑같은 의미
-make(jonh) :- true.  % male(bob). 과 똑같은 의미
+male(john) :- true.  % male(john). 과 똑같은 의미
 ```
 
 왜냐하면 `true`는 무조건 참으로 Prolog에서 미리 정의된 특별한 술어이기 때문.
@@ -281,7 +283,9 @@ Prolog의 규칙 형태의 절 $C$ `:-` $P_1$`,` $P_2$`,` ... `,` $P_n$`.` 는
 추론규칙
 $display(frac(P_1 quad P_2 quad ... quad P_n, C))$ 혹은
 논리식 
-$P_1 and P_2 and ... and P_n ==> C$ 에 해당한다. 
+$P_1 and P_2 and ... and P_n ==> C$ 에 해당한다.
+
+(참고로, 논리식에서는 $==>$ 대신 $-->$나 $supset$기호를 쓰기도 함)
 
 
 #pagebreak()
@@ -291,10 +295,10 @@ $P_1 and P_2 and ... and P_n ==> C$ 에 해당한다.
 
 === 항(term)
 Prolog에서 술어(predicate)가 뭔가 실행되어 움직이는 동적인 무언가라면, \
-항(term)은 정적인 데이터에 해당한다.
+항(term)은 정적인 데이터에 해당한다. 항(term)은 실행되는 것이 아님!!!
 
 항(term)은 다음 셋 중 하나의 형태
-- 변수(variable): `X`, `Y1` 처럼 대문자로 시작
+- 변수(variable): `X`, `Y1` 처럼 대문자로 시작. functor 위치에는 올 수 없음.
 - 상수(constant)
   - atom: `a`, `b1`처럼 소문자로 시작하거나 `'Hello World'` 처럼 따옴표로 둘러싸인 것
   - number: `123`같은 정수나 `3.14`같은 실수
@@ -411,6 +415,7 @@ Prolog 내부적으로 전자는 `f/2`, 후자는 `f/3`와 같이 처리해
 - 푸시다운 오토마타 / 스택 오토마타: Pushdown Automata / Stack Automata \ - 언어의 문법 분석, 등등
 
 #heading(level: 2, numbering: none)[주교재 0.2 수학적 표기법과 용어]
+#v(5mm)
 #heading(level: 3, numbering: none)[집합 set]
 집합(set)은 원소/멤버(element/member)들의 모임.
 
@@ -526,7 +531,7 @@ $ p(a_1, a_2, ..., a_k) = cases(
 ]
 
 
-#heading(level: 2, numbering: none)[관계의 표기법]
+#heading(level: 3, numbering: none)[관계의 표기법]
 관계 $R subset.eq A times B$에서 일반적으로는
 - $(a,b) in R$이면 $R(a,b)$로 표기
 - $(a,b) in.not R$이면 $not R(a,b)$로 표기
@@ -542,65 +547,110 @@ $ p(a_1, a_2, ..., a_k) = cases(
 
 #pagebreak()
 
-그래프 Graph: 점(vertex)을 선(edge)으로 연결하는 구조 $G = (V, E)$
+#heading(level: 3, numbering: none)[그래프 Graph]
+그래프는 두 점(vertex)들을 선(edge)으로 연결하는 구조 $G = (V, E)$
 - 무방향그래프 undirected graph
   - 보통 그냥 그래프 하면 일반적인 이론(이산수학)에서는 이거
-  - 무방향그래프를 방향그래프로 나타낼 수 있음\
-    ($a --> b$와 $b --> a$ 한쌍을 항상 같이 그리기, 한쪽만 그리지 말고)
-- 방향그래프 directed graph: 선이 화살표로 표시되는
-
+  - 선들의 집합$E$를 순서없는쌍(unordered pair)으로 나타낼 수도 있고
+  - 무방향그래프를 방향그래프로 나타낼 수 있음:
+    즉, $a --> b$와 $b --> a$ 한쌍을 항상 같이 그리기, 한쪽만 그리지 말고.
+    이렇게 할 때는 $E$를 순서쌍의 집합으로 나타내되,
+    $E$가 대칭 관계(symmetric relation)가 되도록 구성해야
+- 방향그래프 directed graph
+  - 그림으로 그렸을 때 선이 화살표로 표시됨
+  - 방향그래프는 무방향그래프와 달리 $E subset.eq V times V$가 대칭 관계일 필요 없음.
 
 그래프의 선에 뭔가 라벨/꼬리표(label)를 붙인 것을
 Labeled Graph 라벨된 그래프
 
-라벨이 없는 방향그래프가 $G = (V, {(a,b),(b,c), ...})$
-
-라벨된 방향그래프는 이런 식으로 표시 (어쨌뜬 3개 순서쌍에 해당하는 걸로)
+라벨이 없는 방향그래프가 $G = (V, {(a,b),(b,c), ...})$ 이런 식이라면 \
+라벨된 방향그래프는 이런 것 중 한 방식으로 표시 (triple, 즉 3-tuple에 해당하는 걸로)
 - $G = (V, {(a,l_1,b),(b,l_2,c), ...})$
-- $G = (V, {(a,b,l_2),(b,c,l_2), ...})$
+- $G = (V, {(a,b,l_1),(b,c,l_2), ...})$
+- $G = (V, {(l_1,a,b),(l_2,b,c), ...})$
+
+우리 수업에서는 라벨된 방향그래프를 주로 다룸
 
 #pagebreak()
-
-문자열과 언어
+#heading(level: 3, numbering: none)[문자열과 언어]
 
 알파벳 alphabet
-- 문자열을 만들기 위한 기본 단위인 사용 가능한 글자의 집합. 보통 $Sigma$로 표시
-- 나중에는 $Gamma$로 표시하는 것도 나오는데 그건 나중에
+- 문자열을 만들기 위한 기본 단위인 사용 가능한 글자(character) 혹은 심볼(symbol)의 집합
+- 보통 $Sigma$로 표시 (나중에는 $Gamma$로 표시하는 것도 나오는데 그건 나중에)
+- 일반적인 글자/심볼을 대표하는 변수는 $a,b,c,d in Sigma$ 처럼 같은 영문 알파벳 앞쪽 이탤릭체
+- 구체적인 글자/심볼의 예시는
+  $mathtt("0"),mathtt("1") in Sigma_1$나
+  $mathtt("b"),mathtt("c") in Sigma_2$처럼 고정폭/타자기 폰트로
 
 어떤 알파벳으로 이루어진 문자열 string over an alphabet
 - 가능한 모든 문자열의 전체 집합 $Sigma^* = Sigma^0 union Sigma^1 union Sigma^2 union ...$
+- 일반적인 문자열을 대표하는 변수는 $x,y,z,w in Sigma^*$처럼 영문 알파벳 뒷쪽 이탤릭체
 
-곱집합에서 이미 나온 표기법을 활용하고 있음 \
-영어 알파벳이라면 예를 들어 $a b c = (a,d,c) in Sigma^3$ \
-이런 식으로 원래는 순서쌍이지만 문자열로 취급하는 경우 괄호와 컴마 생략해 표기
-길이 0개짜리 문자열(프로그래밍언어에서 보통 `""`)은 이런 이론에서는 $epsilon$
+문자열은 곱집합의 원소이므로 원래는 tuple 표기법이지만 간략화된 문자열 표기법을 주로 활용. \
+영어 알파벳이라면 예를 들어 $a b c = (a,b,c) in Sigma^3$ 
+이런 식으로 원래는 순서쌍이지만 문자열로 취급하는 경우 괄호와 컴마 생략하고 표기.
 
+문자열의 길이(length)는 문자열에 포함된 글자/심볼의 개수로 정의하며, $x$의 길이를 $|x|$로 표기
 
+길이 0개짜리 문자열(프로그래밍언어에서 보통 `""`)은 이런 이론에서는 $epsilon$으로 표기
+
+이이붙이기(concatenation 동사로는 concat) 표기
+- 두 문자열 $x$와 $y$를 이어붙인 문자열을 $x y$ 혹은 $x dot y$로 표기
 
 (형식)언어 langauge
-- (같은 알파벳을 기반으로 만든) 문자열의 집합
+- (같은 알파벳을 기반으로 만든) 문자열의 집합.즉, $L subset.eq Sigma^*$
 
 
+#pagebreak()
+#heading(level: 1, numbering: none)[주교재 0 정규언어 Regular Languages]
+#v(5mm)
+#heading(level: 2, numbering: none)[주교재 1.1 유한 오토마타 Finite Automata]
+
+Figure 1.1의 이해에 도움이 되는 Reddit에 올라온 참고 이미지 
+- #link("https://www.reddit.com/r/nostalgia/comments/gl8xws/")
+- 문 열리고 지나가기 전에 (about to walk through) 밟는 패드/매트가 "front pad"
+- 문 열린 쪽으로 나가서 (pass all the way through) 밟는 패드/매트가 "rear pad"
+
+Figure 1.4는 상태전이도(state transition diagram, 줄여서 state diagram)의 예시
+- state transition diagram은 방향그래프(directed graph)의 한 종류
+- 라벨된 선/에지(edge)에 해당하는 화살표를 transition(상태전이)라고 부름
+- 출발과 도착점이 같지만 라벨이 다른 상태전이 여러 개를
+  원래 각각 따로 그려야 하지만 \
+  하나로 겹쳐 모아 그리고 여러 라벨을 나열하여 표시하기도 함
+  (그림에서 #mathtt(0), #mathtt(1)로 라벨된 화살표)
+- 그래프의 점(vertex)에 해당하는 상태(state)는 원으로 표시
+- 상태들 중에서 하나의 시작/초기(start/initial) 상태를 허공에서부터 가리키는 화살표로 표시 \ (그림에서 $q_1$. 언제나 딱 하나만 있어야)
+- 상태들 중에서 최종/수락(final/accept state) 상태들은 테두리가 두 겹인 원으로 표시 \ (그림에서 $q_2$. 일반적으로 여러 개 있거나 없을 수도)
+
+#pagebreak()
+유한 오토마타(Finite Automata, 줄여서 FA) 혹은 \
+유한 상태 기계(Finite State Machine, 줄여서 FSM)는 여러 가지 방식으로 활용
+- Figure 1.1-1.3처럼 FA의 각 상태마다 대응되는 실제 장치의 동작상태/모드
+- 확률적 요소가 가미된 마르코프 체인(Markov Chain)은 통계적 시뮬레이션에 활용
+- Figure 1.4처럼 시작부터 최종 상태까지의 전이 과정에 나타난 라벨(label)을 심볼로 취급하여 이를 이어붙인 문자열을 인식/처리하는 용도 $<==$ 우리 주교재에서는 주로 이거에 초점
+
+#heading(level: 2, numbering: none)[주교재 1.2 비결정성 Non-determinism]
+- 결정적 유한 오토마타(Deterministic Finite Automata, 줄여서 DFA)
+  - 상태전이(transition)를 함수 $delta: Q times Sigma arrow Q$로 표현 가능
+- 비결정적 유한 오토마타(Non-deterministic Finite Automata, 줄여서 NFA)도 존재
+  - 상태전이(transition)를 위와 같은 형태의 함수로는 표현할 수 없으므로 \
+    관계 $delta subset.eq Q times Sigma times Q$로 표현
+
+(결정적) 유한 오토마타의 수학적인 정의는 \
+5-tuple(quintuple)인 $(Q, Sigma, delta, q_0, F)$로 표현
+- $Q$는 상태(state)들의 유한 집합
+- $Sigma$는 알파벳 (심볼의 유한 집합)
+- $delta: Q times Sigma arrow Q$는 상태전이(transition) 함수
+- $q_0 in Q$는 시작/초기(start/inital) 상태
+- $F subset.eq Q$는 최종/수락(final/accept) 상태들의 집합
 
 
+#heading(level: 2, numbering: none)[주교재 1.3 정규식 Regular Expressions]
+#heading(level: 2, numbering: none)[주교재 1.3 정규언어가 아닌 언어]
 
+#pagebreak()
+#heading(level: 1, numbering: none)[다음 장]
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// #pagebreak()
+// #heading(level: 1, numbering: none)[다음 장]
 
