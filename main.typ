@@ -611,7 +611,7 @@ Labeled Graph 라벨된 그래프
 
 
 #pagebreak()
-#heading(level: 1, numbering: none)[주교재 0 정규언어 Regular Languages]
+#heading(level: 1, numbering: none)[주교재 1 정규언어 Regular Languages]
 #v(5mm)
 #heading(level: 2, numbering: none)[주교재 1.1 유한 오토마타 Finite Automata]
 
