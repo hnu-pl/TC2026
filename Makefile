@@ -20,7 +20,7 @@ build: | $(BUILD_DIR)/Makefile
 	@if [ -n "$(strip $(DIRTY_SRCS))" ]; then \
 		$(MAKE) -C $(BUILD_DIR) DIRTY_SRCS='$(DIRTY_SRCS)'; \
 	else \
-		echo "No dirty files; skipping _build sub-make."; \
+		echo "No dirty files; skipping $(BUILD_DIR) sub-make."; \
 	fi
 	$(MAKE) update-files-json
 	$(TYPST_COMPILE)
