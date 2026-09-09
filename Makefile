@@ -1,6 +1,6 @@
 # Top-level makefile
 
-.PHONY: all all-clean build build-clean update-files-json
+.PHONY: all all-clean build build-clean update-files-json notes
 
 TYPFILE = main.typ
 BUILD_DIR = _build
@@ -51,3 +51,8 @@ update-files-json:
 
 $(BUILD_DIR)/Makefile: $(TYPFILE)
 	mkdir -p $(BUILD_DIR) && typst eval 'query(<meta:make-file>).map(it=>it.value.code)' --in $< | jq -r '.[]' > $@
+
+notes: all
+	cp main.pdf _notes.pdf
+
+

@@ -90,7 +90,11 @@
 예제(Example)의 2항 함수(binary function)
 $g: cal(Z)_4 times cal(Z)_4 arrow cal(Z)_4$에 해당하는 \
 관계(relation)를 `g`를 정의한다면 그 관계의 항수는 얼마일지 생각해 보고, \
-이 관계 `g`를 Prolog 술어(predicate)로 정의하여 두 개 이상의 쿼리를 작성해 보라.
+이 관계 `g`를 Prolog 술어(predicate)로 정의하여 두 개 이상의 쿼리를 작성해 보라. 
+쿼리들 중에 최소 하나는 여러 개의 해를 얻어 처리할 수 있는
+`findall`이나 `findsols` 및 여러 해를 출력할 수 있도록 돕는
+`forall`을 활용해 활용해 작성해야 한다.
+
 
 (1) `g`의 항수(arity)는? $quad$ 답: #uline(5em)
 
@@ -111,7 +115,12 @@ $g: cal(Z)_4 times cal(Z)_4 arrow cal(Z)_4$에 해당하는 \
 예제(Example)의 판별 함수(조건 함수, predicate, property)
 #mathit("beats")에 해당하는 \
 관계 `beats`를 정의한다면 그 관계의 항수는 얼마일지 생각해 보고, \ 
-마찬가지로 `beats`를 Prolog로 정의하여 두 개 이상의 쿼리를 작성해 보라.
+마찬가지로 `beats`를 Prolog로 정의하여 두 개 이상의 쿼리를 작성해 보라. 
+쿼리들 중에 최소 하나는 여러 개의 해를 얻어 처리할 수 있는
+`findall`이나 `findsols` 및 여러 해를 출력할 수 있도록 돕는
+`forall`을 활용해 활용해 작성해야 한다.
+
+
 
 (1) `beats`의 항수(arity)는? $quad$ 답: #uline(5em)
 
@@ -629,7 +638,7 @@ Figure 1.4는 상태전이도(state transition diagram, 줄여서 state diagram)
 - 확률적 요소가 가미된 마르코프 체인(Markov Chain)은 통계적 시뮬레이션에 활용
 - Figure 1.4처럼 시작부터 최종 상태까지의 전이 과정에 나타난 라벨(label)을 심볼로 취급하여 이를 이어붙인 문자열을 인식/처리하는 용도 $<==$ 우리 주교재에서는 주로 이거에 초점
 
-#heading(level: 2, numbering: none)[주교재 1.2 비결정성 Non-determinism]
+~
 - 결정적 유한 오토마타(Deterministic Finite Automata, 줄여서 DFA)
   - 상태전이(transition)를 함수 $delta: Q times Sigma arrow Q$로 표현 가능
 - 비결정적 유한 오토마타(Non-deterministic Finite Automata, 줄여서 NFA)도 존재
@@ -732,6 +741,7 @@ $ L(M) = { w mid(|) M text("accepts") w } $
 
 
 #pagebreak()
+#heading(level: 2, numbering: none)[주교재 1.2 비결정성 Non-determinism]
 
 #heading(level: 2, numbering: none)[주교재 1.3 정규식 Regular Expressions]
 #heading(level: 2, numbering: none)[주교재 1.3 정규언어가 아닌 언어]
@@ -741,6 +751,7 @@ $ L(M) = { w mid(|) M text("accepts") w } $
 
 // #pagebreak()
 // #heading(level: 1, numbering: none)[다음 장]
+
 
 
 
