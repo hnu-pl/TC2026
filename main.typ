@@ -727,7 +727,7 @@ $delta(q, a_1 a_2 ... a_(n-1) a_n) =
 $ L(M) = { w mid(|) M text("accepts") w } $
 }
 
-오토마타 $M$이 어떤 언어 $A subset.eq Sigma^*$를 인식한다(즉, $M$ accepts $w$)는
+오토마타 $M$이 어떤 언어 $A subset.eq Sigma^*$를 인식한다(즉, $M$ accepts $A$)는
 말은
 - 언어에 속한 모든 문자열 $w in A$은 수락하지만
 - 그밖의 다른 모든 문자열 $x in.not A thin$(또는  $x in overline(A)thin$)는 수락하지 않는다는 뜻.
@@ -751,6 +751,7 @@ $ L(M) = { w mid(|) M text("accepts") w } $
 
 // #pagebreak()
 // #heading(level: 1, numbering: none)[다음 장]
+
 
 
 
