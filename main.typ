@@ -636,14 +636,98 @@ Figure 1.4는 상태전이도(state transition diagram, 줄여서 state diagram)
   - 상태전이(transition)를 위와 같은 형태의 함수로는 표현할 수 없으므로 \
     관계 $delta subset.eq Q times Sigma times Q$로 표현
 
-(결정적) 유한 오토마타의 수학적인 정의는 \
-5-tuple(quintuple)인 $(Q, Sigma, delta, q_0, F)$로 표현
+(결정적) 유한 오토마타(FA) $M$의 수학적인 정의(주교재 Definition 1.5)는 \
+5-tuple(quintuple)인 $M = (Q, Sigma, delta, q_0, F)$로 표현
 - $Q$는 상태(state)들의 유한 집합
 - $Sigma$는 알파벳 (심볼의 유한 집합)
 - $delta: Q times Sigma arrow Q$는 상태전이(transition) 함수
 - $q_0 in Q$는 시작/초기(start/inital) 상태
 - $F subset.eq Q$는 최종/수락(final/accept) 상태들의 집합
 
+#pagebreak()
+Figure 1.4, 1.6의 예시의 유한 오토마타
+$M_1 = ({q_1,q_2,q_3}, {mathtt(0),mathtt(1)},delta_1,q_1,{q_2})$으로
+정의한다면, \ 상태전이 함수 $delta_1: Q times Sigma arrow Q$는 다음과 같다.
+#align(center)[
+  #box( table(
+  columns: 3,
+  stroke: none, // 전체 선 끄기
+  
+  // 첫 번째 열(x:0)의 오른쪽에 선을 긋기 위해 x: 1 지정
+  table.vline(x: 1, stroke: 1pt + black), 
+  
+  [$delta_1$], [#mathtt(0)], [#mathtt(1)],
+  
+  // 첫 번째 행(y:0)의 아래에 선을 긋기 위해 hline 배치
+  table.hline(stroke: 1pt + black), 
+  [],[],[],
+  [$q_1$], [$q_1$], [$q_2$], [],[],[], [],[],[],
+  [$q_2$], [$q_3$], [$q_2$], [],[],[], [],[],[],
+  [$q_3$], [$q_2$], [$q_2$], [],[],[], [],[],[],
+  ))
+  #h(3em)
+  #box( { set math.equation(numbering: none)
+  $delta_1(q_1, mathtt(0)) &= q_1 \
+   delta_1(q_1, mathtt(1)) &= q_2 \
+   delta_1(q_2, mathtt(0)) &= q_3 \
+   delta_1(q_2, mathtt(1)) &= q_2 \
+   delta_1(q_3, mathtt(0)) &= q_2 \
+   delta_1(q_3, mathtt(1)) &= q_2$
+  } )
+]
+
+유한 오토마타/(상태)기계 "$M$이 문자열 $w$를 수락(accept)/인식(recognize)한다"는 말은,
+예컨대, $w = a_1 a_2 a_3$가 길이 3인 문자열이라면
+$delta(delta(delta(q_1,a_1),a_2),a_3) in {q_2}=F_1$,
+여기서 $F_1$은 $M$의 수락/종료(accept/final) 상태들의 집합. 
+이 예시를 차례차례 풀어 쓰자면
+
+//#{ set math.equation(numbering: none)
+  $&quad delta(q_1,  &a_1) &=& q'  \
+   &quad delta(q',   &a_2) &=& q'' \
+   &quad delta(q''', &a_3) &=& q''' in {q_2} = F_1$이면 $M$이 $w=a_1 a_2 a_3$를 수락/인식한다고 판단.
+
+#pagebreak()
+수학스러운 이론에서는
+프로그래밍에서 있어보이듯 따로 용어까지 있는
+함수/연산자 오버로딩(overloading)이라는 개념이 숨쉬듯이 당연
+
+그래서 교재에서는 글자 하나를 처리하는 $delta: Q times Sigma arrow Q$를
+문자열에 나타나는 글자/심볼에 대해 연쇄적으로 호출하는 계산과정을
+같은 이름의 $delta: Q times Sigma^* arrow Q$로 숨쉬듯 자연스럽게 오버로딩
+
+대략
+$delta(a_1 a_2 ... a_(n-1)a_n, q) =
+ delta(delta(...(delta(delta(a_1,q),q_2)...),a_(n-1)),a_n)$
+
+증명에서 활용하는 수학적귀납법의 구조에 딱 떨어지게 맞도록 귀납적으로 정의하자면
+#{ set math.equation(numbering: none)
+  $
+   &delta(q, &epsilon) &=& q \
+   &delta(q, &a w)     &=& delta(delta(a,q),w)
+  $
+}
+위의 귀납적 정의나 교재에 나오는 설명 및 수식에서 어느 것이 심볼/글자 하나를 처리하는 $delta$이고, \
+어느 것이 여러 개의 (즉, 0개 이상의) 심볼로 이루어진 문자열을 처리하는 $delta$인지 구분할 수 있어야
+
+#pagebreak()
+(형식)언어(language)를
+"오토마타가 수락(accept)/인식(recognize)하는 문자열(string)"이라는
+조건을 만족하는 집합으로 정의하기
+#{ set math.equation(numbering: none)
+$ L(M) = { w mid(|) M text("accepts") w } $
+}
+
+오토마타 $M$이 어떤 언어 $A subset.eq Sigma^*$를 인식한다(즉, $M$ accepts $w$)는
+말은
+- 언어에 속한 모든 문자열 $w in A$은 수락하지만
+- 그밖의 다른 모든 문자열 $x in.not A thin$(또는  $x in overline(A)thin$)는 수락하지 않는다는 뜻.
+즉, $L(M) = A$일 때 "$M$이 $A$를 인식/수락"한다고 말한다. \
+(문자열에 대한 "인식/수락" 개념을 언어에 대한 것으로 확장. 일종의 개념적 오버로딩?)
+
+
+
+#pagebreak()
 
 #heading(level: 2, numbering: none)[주교재 1.3 정규식 Regular Expressions]
 #heading(level: 2, numbering: none)[주교재 1.3 정규언어가 아닌 언어]
@@ -653,4 +737,6 @@ Figure 1.4는 상태전이도(state transition diagram, 줄여서 state diagram)
 
 // #pagebreak()
 // #heading(level: 1, numbering: none)[다음 장]
+
+
 
