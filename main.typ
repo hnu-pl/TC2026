@@ -685,7 +685,7 @@ $delta(delta(delta(q_1,a_1),a_2),a_3) in {q_2}=F_1$,
 //#{ set math.equation(numbering: none)
   $&quad delta(q_1,  &a_1) &=& q'  \
    &quad delta(q',   &a_2) &=& q'' \
-   &quad delta(q''', &a_3) &=& q''' in {q_2} = F_1$이면 $M$이 $w=a_1 a_2 a_3$를 수락/인식한다고 판단.
+   &quad delta(q'', &a_3) &=& q''' in {q_2} = F_1$이면 $M$이 $w=a_1 a_2 a_3$를 수락/인식한다고 판단.
 
 #pagebreak()
 수학스러운 이론에서는
@@ -697,14 +697,14 @@ $delta(delta(delta(q_1,a_1),a_2),a_3) in {q_2}=F_1$,
 같은 이름의 $delta: Q times Sigma^* arrow Q$로 숨쉬듯 자연스럽게 오버로딩
 
 대략
-$delta(a_1 a_2 ... a_(n-1)a_n, q) =
- delta(delta(...(delta(delta(a_1,q),q_2)...),a_(n-1)),a_n)$
+$delta(q, a_1 a_2 ... a_(n-1) a_n) =
+ delta(delta( ... delta(delta(q,a_1),a_2),...),a_(n-1)),a_n)$
 
 증명에서 활용하는 수학적귀납법의 구조에 딱 떨어지게 맞도록 귀납적으로 정의하자면
 #{ set math.equation(numbering: none)
   $
    &delta(q, &epsilon) &=& q \
-   &delta(q, &a w)     &=& delta(delta(a,q),w)
+   &delta(q, &a w)     &=& delta(delta(q,a),w)
   $
 }
 위의 귀납적 정의나 교재에 나오는 설명 및 수식에서 어느 것이 심볼/글자 하나를 처리하는 $delta$이고, \
@@ -725,6 +725,10 @@ $ L(M) = { w mid(|) M text("accepts") w } $
 즉, $L(M) = A$일 때 "$M$이 $A$를 인식/수락"한다고 말한다. \
 (문자열에 대한 "인식/수락" 개념을 언어에 대한 것으로 확장. 일종의 개념적 오버로딩?)
 
+
+~
+
+정규 언어(regular language)란 어떤 (결정적) 유한 오토마타(FA) $M$으로 인식할 수 있는 언어.
 
 
 #pagebreak()
