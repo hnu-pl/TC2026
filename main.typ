@@ -81,7 +81,7 @@
 #set text(font: font-serif, size: 12pt, lang: "ko", region: "KR")
 #show raw: set text(font: font-mono, size: 10.5pt, ligatures: false)
 
-
+/******
 ///////////////////////////////////////////////////////////////////
 #heading(level: 1, numbering: none)[HW01 함수(function)와 관계(relation)의 항수(arity)]
 - 이름: 
@@ -138,6 +138,8 @@ $g: cal(Z)_4 times cal(Z)_4 arrow cal(Z)_4$에 해당하는 \
 ```]
 
 ///////////////////////////////////////////////////////////////////
+***********************/
+
 #set page(paper: "a4", flipped: true, margin: (x: 1.5cm, y: 1.2cm))
 #set text(font: font-serif, size: 18pt, lang: "ko", region: "KR")
 #show raw: set text(font: font-mono, size: 14pt, ligatures: false)
@@ -643,7 +645,7 @@ Figure 1.4는 상태전이도(state transition diagram, 줄여서 state diagram)
 - 결정적 유한 오토마타(Deterministic Finite Automata, 줄여서 DFA)
   - 상태전이(transition)를 함수 $delta: Q times Sigma arrow Q$로 표현 가능
 - 비결정적 유한 오토마타(Non-deterministic Finite Automata, 줄여서 NFA)도 존재
-  - 상태전이(transition)를 위와 같은 형태의 함수로는 표현할 수 없으므로 \
+  - 상태전이(transition)를 위와 같은 형태의 함수로는 표현할 수 없는 경우까지 표현 가능한
     관계 $delta subset.eq Q times Sigma times Q$로 표현
 
 (결정적) 유한 오토마타(FA) $M$의 수학적인 정의(주교재 Definition 1.5)는 \
@@ -741,15 +743,20 @@ $ L(M) = { w mid(|) M text("accepts") w } $
 앞으로 책에서 다음 세 방식으로 만들어지는 언어들이 정확히 똑같은 범주의 언어들이라는 것을 증명하는 내용으로 진행
 
 + DFA로 인식할 수 있는 언어
-+ 유한집합을 모두 포함하며 다음 연산들에 대해 닫혀 있는 언어
-  - $A union B$ 합집합 
-  - $A B$ 연결(concatenation). 이건 곱집합 $A times B$와 마찬가지
-  - $A^*$ 몇번이고 원하는 만큼 반복해 연결(Kleene star) 
++ 유한집합을 모두 포함하며 다음 정규 연산들(교재 Definition 1.23: Regular Operations)에 대해 닫혀 있는 언어
+  - $A union B$ 합집합(union) 
+  - $A B$ 또는 $A compose B$ 연결(concatenation). 이건 곱집합 $A times B$와 마찬가지
+  - $A^*$ 몇번이고 원하는 만큼 반복해 연결(Kleene star 또는 그냥 star) 
 + 정규식으로 정의할 수 있는 언어 (이건 2번을 간결한 문법으로 표현한 것일 뿐)
 
 ~
 
 참고로 다른 교재들에서는 2번이나 3번을 정규 언어의 정의로 약속하고 나머지가 똑같다는 식으로 책의 내용을 구성하기도 함.
+
+우리는 당분간 1번의 언어가 2번에 나타나는 연산들에 대해 닫혀 있음을 보이는 데 집중할 예정. \
+근데 이게 뭘 증명하는지 큰 그림을 파악할 필요!!!!!!
+- 1번(DFA로 인식 가능한 언어들)이 2번(정규연산에 닫혀있는 언어들)에 모두 포함 ~~~~ ???
+- 2번(정규연산에 닫혀있는 언어들)이 1번(DFA로 인식 가능한 언어들)에 모두 포함 ~~~~ ???
 
 
 #pagebreak()
@@ -777,7 +784,7 @@ $M_2 = (Q_2={p_0,p_1,...}, Sigma, delta_2, p_0, F_2)$ 로부터 다음을 만들
 $M = (Q = Q_1 times Q_2, thick Sigma, thick delta, thick (q_0,p_0), thick
       F = {(r_1,r_2) mid(|) r_1 in F_1 or r_2 in F_2 })$
 
-여기서 $delta((q,p),a) = (delta_1(q), delta_2(p))$
+여기서 $delta((q,p),a) = (delta_1(q,a), delta_2(p,a))$
 
 #pagebreak()
 합집합 예시
@@ -860,34 +867,102 @@ $M = ( Q_1 times Q_2,Sigma,delta,(q_0,p_0),
 
 #pagebreak()
 필요 없는(즉, 시작 상태에서 도달 불가능 unreachable) 상태 제거 연습
+
 #automaton(
     layout: (
-      q00: (0+2,0), q01: (6+2,0), q02: (12+2,0), q03: (18+2,0),
-      q10: (0+0,3), q11: (6+0,3), q12: (12+0,3), q13: (18+0,3),
-      q20: (0+3,6), q21: (6+3,6), q22: (12+3,6), q23: (18+3,6),
+      q00: (0+2,0), /*q01: (6+2,0),*/ // q02: (12+2,0), q03: (18+2,0),
+      /* q10: (0+0,3),*/ q11: (6+0,3), // q12: (12+0,3), q13: (18+0,3),
+      /*q20: (0+3,6),*/ q21: (6+3,6), q22: (12+3,6), q23: (18+3,6),
     ),
     (
       q00: (q21: 0, q11: 1),
-      q01: (q21: 0, q12: 1),
-      q02: (q23: 0, q13: 1),
-      q03: (q23: 0, q13: 1),
-      q10: (q21: (0, 1)),
+      // q01: (q21: 0, q12: 1),
+      // q02: (q23: 0, q13: 1),
+      // q03: (q23: 0, q13: 1),
+      // q10: (q21: (0, 1)),
       q11: (q22: (0, 1)),
-      q12: (q23: (0, 1)),
-      q13: (q23: (0, 1)),
-      q20: (q21: (0, 1)),
+      // q12: (q23: (0, 1)),
+      // q13: (q23: (0, 1)),
+      // q20: (q21: (0, 1)),
       q21: (q22: (0, 1)),
       q22: (q23: (0, 1)),
       q23: (q23: (0, 1)),
     ),
     initial: "q00",
-    final: ("q10","q11","q12","q13","q02","q22"),
+    final: (/*"q10",*/"q11",/*"q12","q13","q02",*/"q22"),
   )
 
 #pagebreak()
+같은 방식(즉, DFA만)으로 연결(concatenation)에 대해 닫혀있음을 보이기 어려운 이유
 
+대략 이런 방향으로 진행해야
 
++ $A$와 $B$가 정규언어라면
+  정의에 따라 $L(M_1) = A$이고 $L(M_2) = B$인 DFA $M_1$과 $M_2$가 존재
++ 어떤 문자열 $w$를 잘 분해해서(모든 가능한 경우 중 하나라도 되는 게 있으면 ok)
+  $w = x y$로 
+   - 앞부분 $x$는 $M_1$한테 넘겨서 윙 돌려서 accept 되나 확인하고 된다면 다음으로 넘어가서
+   - 뒷부분 $y$는 $M_2$한테 넘기서 윙 돌려서 accept 되는지 확인
+  이렇게 되면 $A B = C$에 $w$가 속한다고
+  이런 식으로 DFA 2개를 활용해서 판단 가능
++ 문자열 $w$를 나눌 때 최대 개수가 한정된 유한한 최대범위 내의 경우의 수 이내로만 따질 수 있다면,
+  이걸 혼자 처리하는 한개짜리 DFA $M$을 만들 수 있을 거 같기는 한데 ...
+
+모든 가능한 경우를 고려한다는 게 최대치가 얼마인지 정하기가 어려움
+- A와 B가 둘다 유한집합이면 쉽게 모든 가능한 경우의 최대 분기 개수를 한정할 수 있음
+- 문제는 A와 B가 무한집합일 수도 있다는 점
+
+즉, 2번 과정에서 $w$의 길이가 길어지면 길어지수록 고려해야 할 경우의 수가
+그 길이에 비례해서 많아지므로 어디까지를 경우의 수 최대값 한도로 정하기 어려움. \
+경우의 수 최대값 한도가 정해지지 않으면 $M$의 상태 집합을 최대 몇개로 잡아야 할지 ... \
+유한오토마타는 상태 집합이 유한집합이어야 하는데 바로 그게 문제
+
+#pagebreak()
 #heading(level: 2, numbering: none)[주교재 1.2 비결정성 Non-determinism]
+일반적인 의미로는 비결정적(non-deteriministic)이라고 하면 결정적인 경우를 제외한 나머지
+
+하지만 "비결정적 유한오토마타"(NFA)는 "결정적 유한오토마타"(DFA)의 개념을 사실상 포함
+- NFA: $(Q,Sigma,delta,q_0,F)$에서 $delta$가 전이"관계" transition relation
+- DFA: $(Q,Sigma,delta,q_0,F)$에서 $delta$가 전이"함수" transition function
+함수(function)은 관계(relatioin)의 일종(함수 = 전단사관계; one-to-one 단사, onto 전사)
+
+그러니까, 모든 DFA는 NFA 형태로 쉽게 옮겨적을 수 있음. 함수를 관계로 표현하기만 하면 됨.
+ 
+
+NFA 예시: ~~
+첫 글자 #mathtt("1")이 나온 다음에,
+#mathtt("01")이 (0회 이상) 반복 또는
+#mathtt("10")이 (0회 이상) 반복
+#automaton(
+    layout: (
+      q0: (0,0),
+      q1: (3, 2),
+      q3: (3,-1),
+    ),
+    (
+      q0: (q1: 1, q3: 1),
+      q1: (q2: 0),
+      q2: (q1: 1),
+      q3: (q4: 1),
+      q4: (q3: 0),
+    ),
+    initial: "q0",
+    final: ("q1","q3"),
+  )
+
+화살표에 대응되어 처리되지 않는 입력은
+대략 DFA의 흡수/죽음/함정/나락 상태(sink/dead/trap state)에 해당
+
+#pagebreak()
+여러 선택 가능한 경로들 중 하나라도 수락/최종 상태(accept/final state)에 도달하면 됨
+
+https://static0.cbrimages.com/wordpress/wp-content/uploads/2019/05/doctor-strange-avengers-infinity-war.jpg
+ \
+"어벤저스: 인피니티워" 영화 중에서, 1400만개의 미래 중 타노스를 막을 수 있는 단 1개라도 ...
+
+교재 Figure 1.28, Figure 1.29 참고
+
+#pagebreak()
 
 #heading(level: 2, numbering: none)[주교재 1.3 정규식 Regular Expressions]
 #heading(level: 2, numbering: none)[주교재 1.3 정규언어가 아닌 언어]
@@ -897,6 +972,21 @@ $M = ( Q_1 times Q_2,Sigma,delta,(q_0,p_0),
 
 // #pagebreak()
 // #heading(level: 1, numbering: none)[다음 장]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
