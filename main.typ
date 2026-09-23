@@ -106,7 +106,7 @@ start(q1).   % start state
 final([q4]). % accept states
 
 % Str은 '01011' 같은 atom 형태로 제공
-recognize(Str) :- start(Q), atom_chars(Str, CS, Q).
+recognize(Str) :- atom_chars(Str, CS), start(Q), recog_chars(CS, Q).
 
 recog_chars([],     Q) :- true.     % true 대신 여기에 코드 작성.
 recog_chars([C|CS], Q) :- true.     % true 대신 여기에 코드 작성.
@@ -138,7 +138,7 @@ final([q4]). % accept states
 
 % Str은 '01011' 같은 atom 형태로 제공
 % Str은 '01011' 같은 atom 형태로 제공
-recognize(Str) :- start(Q), atom_chars(Str, CS, Q).
+recognize(Str) :- atom_chars(Str, CS), start(Q), recog_chars(CS, Q).
 
 recog_chars(CS,     Q) :- true.     % true 대신 여기에 코드 작성.
                                     % 여러 개의 clause로 나눠서 작성해도 됨.
@@ -187,7 +187,7 @@ recog_chars(CS,     Q) :- true.     % true 대신 여기에 코드 작성.
 
 
 
-/******
+/**********
 ///////////////////////////////////////////////////////////////////
 #heading(level: 1, numbering: none)[HW01 함수(function)와 관계(relation)의 항수(arity)]
 - 이름: 
@@ -207,12 +207,16 @@ $g: cal(Z)_4 times cal(Z)_4 arrow cal(Z)_4$에 해당하는 \
 
 (2) 관계 정의 코드와 쿼리를 아래에 작성하고 문서를 make로 빌드하여 실행 결과 확인.
 #code(file: "TC26hw01.pl")[```prolog
-% 여기에 g(...). 코드 작성
+g(0,0,0). g(0,1,1). g(0,2,2). g(0,3,3).
+g(1,0,1). g(1,1,2). g(1,2,3). g(1,3,0).
+g(2,0,2). g(2,1,3). g(2,2,0). g(2,3,1).
+g(3,0,3). g(3,1,0). g(3,2,1). g(3,3,2).
 
-?- true,                    % 이 줄의 true 대신 적절한 첫째 쿼리 작성
-   format('~w ~w!~n', ['1st','result']). % 적절한 형식으로 결과 출력
-?- true,                    % 이 줄의 true 대신 적절한 첫째 쿼리 작성
-   format('~w ~w!~n', ['2nd','result']). % 적절한 형식으로 결과 출력
+?- g(3, 3, Z),                    
+   format('g(3,3,Z) 의 해는 Z=~w !~n', [Z]).
+
+?- findall( (X,Y), g(X,Y,1), Bag),
+   forall( member((X,Y),Bag), format('~w ~w!~n', [X,Y]) ).
 ```]
 
 #pagebreak()
@@ -244,7 +248,7 @@ $g: cal(Z)_4 times cal(Z)_4 arrow cal(Z)_4$에 해당하는 \
 ```]
 
 ///////////////////////////////////////////////////////////////////
-***********************/
+*******/
 
 #set page(paper: "a4", flipped: true, margin: (x: 1.5cm, y: 1.2cm))
 #set text(font: font-serif, size: 18pt, lang: "ko", region: "KR")
@@ -1105,6 +1109,15 @@ DFA가 인식하는 언어(즉, 정규언어)가 연결에 대해 닫혀있다�
 
 // #pagebreak()
 // #heading(level: 1, numbering: none)[다음 장]
+
+
+
+
+
+
+
+
+
 
 
 
