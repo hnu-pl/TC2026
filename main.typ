@@ -90,7 +90,8 @@
 #heading(level: 2, numbering: none)[주교재 Figure 1.30]
 $epsilon$이 없는 NFA에서 문자열 인식
 #code(file: "TC26hw02Fig1dot30.pl")[```prolog
-?- atom_chars('abac', CS), atom_chars(Str, ['a','b','c']),
+?- atom_chars('abac', CS),
+   atom_chars(Str, ['a','b','c']),
    format('atom_chars 실행 예시 ~w ~w ~n', [CS, Str]).
 
 state([q1,q2,q3,q4]). % all states
@@ -1104,6 +1105,7 @@ DFA가 인식하는 언어(즉, 정규언어)가 연결에 대해 닫혀있다�
 
 // #pagebreak()
 // #heading(level: 1, numbering: none)[다음 장]
+
 
 
 
