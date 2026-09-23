@@ -81,6 +81,111 @@
 #set text(font: font-serif, size: 12pt, lang: "ko", region: "KR")
 #show raw: set text(font: font-mono, size: 10.5pt, ligatures: false)
 
+///////////////////////////////////////////////////////////////////
+#heading(level: 1, numbering: none)[HW02 NFA로 문자열 인식]
+- 이름: 
+- 학번: 
+#v(0.5em)
+
+#heading(level: 2, numbering: none)[주교재 Figure 1.30]
+$epsilon$이 없는 NFA에서 문자열 인식
+#code(file: "TC26hw02Fig1dot30.pl")[```prolog
+?- atom_chars('abac', CS), atom_chars(Str, ['a','b','c']),
+   format('atom_chars 실행 예시 ~w ~w ~n', [CS, Str]).
+
+state([q1,q2,q3,q4]). % all states
+
+% alphabet 정의는 생략
+
+delta(q1, '0', q1). delta(q1, '1', q1). delta(q1, '1', q2).
+delta(q2, '0', q3). delta(q2, '1', q3).
+delta(q3, '0', q4). delta(q3, '1', q4).
+
+start(q1).   % start state
+final([q4]). % accept states
+
+% Str은 '01011' 같은 atom 형태로 제공
+recognize(Str) :- start(Q), atom_chars(Str, CS, Q).
+
+recog_chars([],     Q) :- true.     % true 대신 여기에 코드 작성.
+recog_chars([C|CS], Q) :- true.     % true 대신 여기에 코드 작성.
+
+?- true,                    % 이 줄의 true 대신 적절한 첫째 쿼리 작성
+   format('~w ~w!~n', ['1st','result']). % 적절한 형식으로 결과 출력
+?- true,                    % 이 줄의 true 대신 적절한 첫째 쿼리 작성
+   format('~w ~w!~n', ['2nd','result']). % 적절한 형식으로 결과 출력
+```]
+
+
+#pagebreak()
+- 이름: 
+- 학번: 
+#heading(level: 2, numbering: none)[주교재 Figure 1.27]
+$epsilon$이 있는 NFA에서 문자열 인식
+#code(file: "TC26hw02Fig1dot27.pl")[```prolog
+state([q1,q2,q3,q4]). % all states
+
+% alphabet 정의는 생략
+
+delta(q1, '0', q1). delta(q1, '1', q1). delta(q1, '1', q2).
+delta(q2, '0', q3). delta(q2,  '', q3). % epsilon을 ''로 표현
+delta(q3, '0', q4).
+delta(q4, '0', q4). delta(q4, '1', q4).
+
+start(q1).   % start state
+final([q4]). % accept states
+
+% Str은 '01011' 같은 atom 형태로 제공
+% Str은 '01011' 같은 atom 형태로 제공
+recognize(Str) :- start(Q), atom_chars(Str, CS, Q).
+
+recog_chars(CS,     Q) :- true.     % true 대신 여기에 코드 작성.
+                                    % 여러 개의 clause로 나눠서 작성해도 됨.
+                                    % 도우미/보조 predicate을 추가로 작성해도 됨.
+
+?- true,                    % 이 줄의 true 대신 적절한 첫째 쿼리 작성
+   format('~w ~w!~n', ['1st','result']). % 적절한 형식으로 결과 출력
+?- true,                    % 이 줄의 true 대신 적절한 첫째 쿼리 작성
+   format('~w ~w!~n', ['2nd','result']). % 적절한 형식으로 결과 출력
+```]
+
+
+
+
+#pagebreak()
+- 이름: 
+- 학번: 
+#heading(level: 2, numbering: none)[주교재 Figure 1.27 + $q_2 stretch(<--)^epsilon q_3$]
+$epsilon$전이들로 이루어진 cycle이 있는 NFA에서 문자열 인식
+#code(file: "TC26hw02epscyc.pl")[```prolog
+state([q1,q2,q3,q4]). % all states
+
+% alphabet 정의는 생략
+
+delta(q1, '0', q1). delta(q1, '1', q1). delta(q1, '1', q2).
+delta(q2, '0', q3). delta(q2,  '', q3). % epsilon을 ''로 표현
+delta(q3, '0', q4). delta(q3,  '', q2).
+delta(q4, '0', q4). delta(q4, '1', q4).
+
+start(q1).   % start state
+final([q4]). % accept states
+
+% Str은 '01011' 같은 atom 형태로 제공
+% Str은 '01011' 같은 atom 형태로 제공
+recognize(Str) :- start(Q), atom_chars(Str, CS, Q).
+
+recog_chars(CS,     Q) :- true.     % true 대신 여기에 코드 작성.
+                                    % 여러 개의 clause로 나눠서 작성해도 됨.
+                                    % 도우미/보조 predicate을 추가로 작성해도 됨.
+
+?- true,                    % 이 줄의 true 대신 적절한 첫째 쿼리 작성
+   format('~w ~w!~n', ['1st','result']). % 적절한 형식으로 결과 출력
+?- true,                    % 이 줄의 true 대신 적절한 첫째 쿼리 작성
+   format('~w ~w!~n', ['2nd','result']). % 적절한 형식으로 결과 출력
+```]
+
+
+
 /******
 ///////////////////////////////////////////////////////////////////
 #heading(level: 1, numbering: none)[HW01 함수(function)와 관계(relation)의 항수(arity)]
@@ -962,6 +1067,33 @@ https://static0.cbrimages.com/wordpress/wp-content/uploads/2019/05/doctor-strang
 
 교재 Figure 1.28, Figure 1.29 참고
 
+~
+
+$delta$가 관계(relation)인 것 말고 또 다른 NFA의 추가 기능: $epsilon$전이($epsilon$-transition)
+- 그림에서는 화살표 라벨에(label)에 $epsilon$ 표기
+- 엡실론 생각하지 않으면 $delta subset.eq Q times Sigma times Q$ 일텐데
+- 엡실론 전이를 허용하면  $delta subset.eq Q times (Sigma union {epsilon}) times Q$ 
+- 원래 오토마타는 글자/심볼 하나를 보고/처리하고 화살표를 따라 수락하지만
+- $epsilon$이 붙어있는 화살표는 글자/심볼 처리하지 않고 그대로 두고 화살표를 따라 이동 허용
+- 활용 방식
+  - 출발/도착이 같은 다른 글자/심볼과 함께 쓰면 (교재 Figure 1.27) \ 그 글자가 있어도 되고 없어도 된다는 
+  - 수락/종료(accept/final) 상태를 항상 1개로 만들 수 있음 \
+    원래 NFA의 수락상태들 일반상태로 만들고 거기서 새로운 하나의 수락상태로 엡실론 전이 추가
+- 다른 교재나 자료들에서는 엡실론 전이를 점선 화살표로 강조하기도 함
+
+
+#pagebreak()
+이런 엡실론 전이를 포함한 NFA가 인식하는 언어는 \
+연결(concatenation)에 대해 닫혀있음을 보이기/증명하기 쉬워짐
+
+
+근데 NFA는 DFA가 아니잖아? ...
+
+NFA가 할 수 있는 일이 많아 보여도 사실 DFA가 할 수 있는 범위의 일밖에 못한다 ... \
+그러니까 쌤쌤이다 <== 이것까지 증명하면 .....
+
+DFA가 인식하는 언어(즉, 정규언어)가 연결에 대해 닫혀있다는 것을 증명하는 셈
+
 #pagebreak()
 
 #heading(level: 2, numbering: none)[주교재 1.3 정규식 Regular Expressions]
@@ -972,6 +1104,26 @@ https://static0.cbrimages.com/wordpress/wp-content/uploads/2019/05/doctor-strang
 
 // #pagebreak()
 // #heading(level: 1, numbering: none)[다음 장]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
