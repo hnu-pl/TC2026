@@ -137,7 +137,6 @@ start(q1).   % start state
 final([q4]). % accept states
 
 % Str은 '01011' 같은 atom 형태로 제공
-% Str은 '01011' 같은 atom 형태로 제공
 recognize(Str) :- atom_chars(Str, CS), start(Q), recog_chars(CS, Q).
 
 recog_chars(CS,     Q) :- true.     % true 대신 여기에 코드 작성.
@@ -172,8 +171,7 @@ start(q1).   % start state
 final([q4]). % accept states
 
 % Str은 '01011' 같은 atom 형태로 제공
-% Str은 '01011' 같은 atom 형태로 제공
-recognize(Str) :- start(Q), atom_chars(Str, CS, Q).
+recognize(Str) :- atom_chars(Str, CS), start(Q), recog_chars(CS, Q).
 
 recog_chars(CS,     Q) :- true.     % true 대신 여기에 코드 작성.
                                     % 여러 개의 clause로 나눠서 작성해도 됨.
@@ -1109,6 +1107,8 @@ DFA가 인식하는 언어(즉, 정규언어)가 연결에 대해 닫혀있다�
 
 // #pagebreak()
 // #heading(level: 1, numbering: none)[다음 장]
+
+
 
 
 
