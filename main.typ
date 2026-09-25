@@ -130,7 +130,7 @@ state([q1,q2,q3,q4]). % all states
 
 delta(q1, '0', q1). delta(q1, '1', q1). delta(q1, '1', q2).
 delta(q2, '0', q3). delta(q2,  '', q3). % epsilon을 ''로 표현
-delta(q3, '0', q4).
+delta(q3, '1', q4).
 delta(q4, '0', q4). delta(q4, '1', q4).
 
 start(q1).   % start state
@@ -164,7 +164,7 @@ state([q1,q2,q3,q4]). % all states
 
 delta(q1, '0', q1). delta(q1, '1', q1). delta(q1, '1', q2).
 delta(q2, '0', q3). delta(q2,  '', q3). % epsilon을 ''로 표현
-delta(q3, '0', q4). delta(q3,  '', q2).
+delta(q3, '1', q4). delta(q3,  '', q2).
 delta(q4, '0', q4). delta(q4, '1', q4).
 
 start(q1).   % start state
@@ -1075,7 +1075,8 @@ https://static0.cbrimages.com/wordpress/wp-content/uploads/2019/05/doctor-strang
 $delta$가 관계(relation)인 것 말고 또 다른 NFA의 추가 기능: $epsilon$전이($epsilon$-transition)
 - 그림에서는 화살표 라벨에(label)에 $epsilon$ 표기
 - 엡실론 생각하지 않으면 $delta subset.eq Q times Sigma times Q$ 일텐데
-- 엡실론 전이를 허용하면  $delta subset.eq Q times (Sigma union {epsilon}) times Q$ 
+- 엡실론 전이를 허용하면  $delta subset.eq Q times (Sigma union {epsilon}) times Q$ \
+  (참고로 교재에서는 $Sigma_epsilon = Sigma union {epsilon}$이라는 기호로 짧게 표시)
 - 원래 오토마타는 글자/심볼 하나를 보고/처리하고 화살표를 따라 수락하지만
 - $epsilon$이 붙어있는 화살표는 글자/심볼 처리하지 않고 그대로 두고 화살표를 따라 이동 허용
 - 활용 방식
@@ -1098,6 +1099,8 @@ NFA가 할 수 있는 일이 많아 보여도 사실 DFA가 할 수 있는 범�
 DFA가 인식하는 언어(즉, 정규언어)가 연결에 대해 닫혀있다는 것을 증명하는 셈
 
 #pagebreak()
+
+
 
 #heading(level: 2, numbering: none)[주교재 1.3 정규식 Regular Expressions]
 #heading(level: 2, numbering: none)[주교재 1.3 정규언어가 아닌 언어]
