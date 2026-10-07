@@ -1292,21 +1292,21 @@ DFA의 상태 하나에 해당하는 멱집합의 원소 $R in cal(P)(Q)$ 즉 $R
 - $underline({q_1})$
   #v(.8em)
 - ${q_1}$, $underline({q_1,q_2})$ #h(12em) 
-  ${q_1} stretch(-->)^0 {q_1}$, #h(1em) ${q_1} stretch(-->)^0 underline({q_1,q_2})$
+  ${q_1} stretch(-->)^0 {q_1}$, #h(1em) ${q_1} stretch(-->)^1 underline({q_1,q_2})$
   #v(.8em)
 - ${q_1}$, ${q_1,q_2}$, $underline({q_1,q_3})$, $underline({q_1,q_2,q_3})$ #h(3em)
   ..., ${q_1,q_2} stretch(-->)^0 underline({q_1,q_3})$,~
   ${q_1,q_2} stretch(-->^1 underline({q_1,q_2,q_3}))$ ...
   #v(.8em)
-- ${q_1}$, ${q_1,q_2}$, ${q_1,q_3}$, ${q_1,q_2,q_3}$ #h(3em)
+- ${q_1}$, ${q_1,q_2}$, ${q_1,q_3}$, ${q_1,q_2,q_3}$,
+  $underline({q_1,q_2,q_4})$, $underline({q_1,q_2,q_3,q_4})$ #h(4em) \
+  #v(.8em)
+  #h(18em)
   ...      ${q_1,q_3} stretch(-->)^1 underline({q_1,q_2,q_4})$, #v(0em)
   #h(19em) ${q_1,q_2,q_3} stretch(-->)^1 underline({q_1,q_2,q_3,q_4})$, ...
   #v(.8em)
-- ${q_1}$, ${q_1,q_2}$, ${q_1,q_3}$, ${q_1,q_2,q_3}$,
-  $underline({q_1,q_2,q_4})$, $underline({q_1,q_2,q_3,q_4})$
-  #h(4em) ...~...~...
-  #v(.8em)
-- ... ... ... $underline({q_1,q_3,q_4})$ ~ 아마도 여기서 이거 하나 더 안나올 듯?
+
+- ... ... ... $underline({q_1,q_3,q_4})$ ~ 아마도 여기서 이거 하나 말고는 더 안나올 듯?
   #v(.8em)
 
 
@@ -1434,9 +1434,73 @@ $epsilon$전이를 포함한 NFA로 할 수 있는 일도 모두 DFA로 할 수 
 - DFA의 수락상태집합
   $F' = {thin R mid(|) R in Q',thick E(X) inter R eq.not emptyset thin}$
 
+~ 
+
+그 다음 주교재에서는 Closed Under the Regular Operations
+
+앞서 이야기했든 NFA를 이해했으면 그림만 그려놔도 증명이 이해되는 내용
+
+그런데, 그 중에서 스타 연산에 대한 그림에서 $epsilon$ 전이로 새로운 시작 상태를
+만드는지 부분은 생각해 보고 이해할 필요가 있음.
+
+이걸 몰라도 제시된 증명의 논리 흐름 자체는 문제가 없으므로 증명이 맞다는 걸 확인하는 건 
+문제가 없는데, 새로운 상태를 만들지 않으면 이 증명이 진행되지 않는다는 걸 이해해야
+스타 연산에 대해 닫혀있다는 증명을 좀더 제대로 이해하는 것.
+
+스타 연산 적용한 NFA 구성할 때 새로운 시작상태를 만들지 않으면 문제 생기는 경우
+- 수락상태가 아닌 다른 곳에서 시작상태로 돌아오는 $epsilon$전이가 있을 때
+
 #pagebreak()
 
 #heading(level: 2, numbering: none)[주교재 1.3 정규식 Regular Expressions]
+정규식은 의도적으로 기존에 사용하던 기호를 많이  overloading하고 있음에 유의!
+
+정규식의 의미는 언어(문자열 집합)다. (아래에서 $R$, $R_1$, $R_2$는 정규식)
++ 알파벳 심볼을 오버로딩한 정규식 $a$의 의미는 ${a}$
++ 엡실론 기호를 오버로딩한 정규식 $epsilon$의 의미는 ${epsilon}$
++ 공집합 기호를 오버로딩한 정규식 $emptyset$의 의미는 ${}$
++ 합집합 기호를 오버로딩한 $R_1 union R_2$의 의미는, \
+  $R_1$의 의미가 언어 $A_1$이고 $R_2$의 의미는 언어 $A_2$일 때, 
+  두 언어의 합집합 $A_1 union A_2$
+  - 다른 교재나 자료에서는 $R_1mathtt("|")R_2$ 또는 $R_1 + R_2$와 같이 표기하기도 함.
++ 연결(concatenation)을 오버로딩한 $R_1 compose R_2$혹은 $R_1 R_2$의 의미는, \ 
+   $R_1$의 의미가 언어 $A_1$이고 $R_2$의 의미는 언어 $A_2$일 때, 
+   두 언어의 연결 $A_1 compose A_2$ \ 즉, ${ x y | x in A_1, y in A_2 }$
+  - 다른 교재나 자료에서는 $R_1 dot R_2$와 같이 표기하기도 함.
++ 스타 연산을 오버로딩한 $R^*$의 의미는, $R$의 의미가 언어 $A$일 때, 
+  $A$의 스타 연산 $A^*$ \
+  즉, ${ x_1 x_2 ... x_n | x_i in A,thick n in bb(N) }$
+  또는 $A^0 union A^1 union A^2 union dots.c$
+
+
+~
+
+정규식이 영어로 regular expression이므로 약어로 regex라고 많이들 부른다. \
+또 헷갈리지 않는 범위에서는 RE라고 줄여서 부르는 경우도 있음.
+#pagebreak()
+
+교재 Lemma 1.55는 regex로 표현 가능하면 "DFA로 인식할 수 있다"(=정규언어의 정의)는 내용.
+
+이건 이미 NFA와 DFA가 동등하고 NFA가 인식하는 언어들 정규 연산에 대해 닫혀 있다고
+살펴본 내용으로 이미 거의 증명된 거나 마찬가지.
+
+다시 한번 강조하지만 이 증명은 유한집합과 정규연산으로 만들어낼 수 있는 집합(언어)들이
+정규언어임을 보장한다는 말.
+즉 정규연산으로 만들어낼 수 있는 언어들이 모든 정규언어의 부분집합에 해당한다는 이야기.
+
+~
+
+- 교재 Lemma 1.6는 반대 방향, 그러니까 DFA로 인식할 수 있는 언어는 빠짐없이 regex로 표현 가능하다는 내용.
+
+방법은 NFA보다도 더 기능이 강력한 GNFA(Generalized NFA)를 이용하는 것.
+- GNFA는 상태 전이 라벨이 심볼 또는 $epsilon$이 아니라 regex(정규식)
+
+
+#pagebreak()
+TODO
+
+
+#pagebreak()
 #heading(level: 2, numbering: none)[주교재 1.3 정규언어가 아닌 언어]
 
 #pagebreak()
@@ -1444,94 +1508,3 @@ $epsilon$전이를 포함한 NFA로 할 수 있는 일도 모두 DFA로 할 수 
 
 // #pagebreak()
 // #heading(level: 1, numbering: none)[다음 장]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
