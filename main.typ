@@ -11,6 +11,7 @@
 #import "@preview/ilm:2.1.1": *
 #import "@preview/finite:0.5.1": automaton
 #import "@preview/diagraph:0.3.7": raw-render
+#import "@preview/xarrow:0.4.0": xarrow
 
 // ==================== 한글 폰트 설정 ====================
 #let font-serif = "Noto Serif CJK KR"
@@ -1493,18 +1494,109 @@ $epsilon$전이를 포함한 NFA로 할 수 있는 일도 모두 DFA로 할 수 
 - 교재 Lemma 1.6는 반대 방향, 그러니까 DFA로 인식할 수 있는 언어는 빠짐없이 regex로 표현 가능하다는 내용.
 
 방법은 NFA보다도 더 기능이 강력한 GNFA(Generalized NFA)를 이용하는 것.
-- GNFA는 상태 전이 라벨이 심볼 또는 $epsilon$이 아니라 regex(정규식)
-
+- GNFA는 상태 전이 라벨이 심볼 또는 $epsilon$이 아니라 정규식(regex)
+- DFA를 NFA로 쉽게 변환할 수 있는 것처럼, 
+  NFA를 GNFA로 쉽게 변환할 수 있음.
+  - 왜내하면 심볼과 $epsilon$에 해당하는 오버로딩된 정규식이 있기 때문
+  - 똑같이 생겼는데 상태 전이 라벨이 심볼 또는 $epsilon$이 아니라 정규식(regex)으로 바뀌면 됨.
 
 #pagebreak()
-TODO
+DFA $-->$ GNFA $-->$ RegEx 변환 과정
++ 우선 시작 상태와 수락 상태를 새롭게 만들기
+  - 새로운 시작 상태를 만들기
+    - 기존 시작 상태로 $epsilon$전이 화살표를 연결
+    - 기존 시작 상태를 더 이상 시작 상태가 아닌 것으로 처리
+  - 수락 상태를 하나로 통함
+    - 새로운 수락 상태를 만들고
+    - 기존 수락 상태들에서 $epsilon$전이 화살표로 연결
+    - 기존 수락 상태들은 더 이상 수락 상태가 아닌 것으로 처리
+      #v(1em)
++ 다음과 같이 상태, 화살표를 줄이는 과정을 반복 #v(.5em)
+  - $q_1 -->^(R_1) q_2 -->^(R_2) q_3 $를 ~~~~ $q_1 xarrow(thick R_1 thin R_2 thick) q_3 $ 로 줄임. #v(1em)  (상태도 줄어들고 화살표도 줄어들고)
+  - $q_1 -->^(R_1) q_2$와 $q_1 -->^(R_2) q_2 $를 ~~~~ $q_1 xarrow(thick R_1 union R_2 thick) q_2 $ 로 줄임. (화살표만 줄어듦)#v(1em)
+  - $q_1 -->^(R_1) q_2 #box(baseline: 1em)[#h(-1em)$arrow.ccw_(R_2)$] #h(-.1em) -->^(R_3) q_3 $를 ~~~~ $q_1 xarrow(thick R_1 thin R_2^* thin R_3 thick thick) q_3 $ 로 줄임. (상태도 줄어들고 화살표도 줄어들고) #v(1em)
 
++ 위 과정을 시작, 수락 상태 두 개만 남고 화살표는 하나만 남을 때까지 반복
+  - 화살표가 하나만 남으면 그 라벨이 바로 원래 DFA를 나타내는 정규식(regex)
 
 #pagebreak()
 #heading(level: 2, numbering: none)[주교재 1.3 정규언어가 아닌 언어]
 
-#pagebreak()
-#heading(level: 1, numbering: none)[다음 장]
+~ 
 
+수업시간에 텍스트 노트패드에다 설명함
+
+다음에 기회가 되면 정리 내용을 추가할 수도 ...
+
+#pagebreak()
+#heading(level: 1, numbering: none)[주교재 2 Context-Free Languages 문맥자유언어]
+#v(1em)
+
+정규언어(regular language)를
+- 표현하기 좋은 *정규식*(regular expression, regex)
+- 인식하기 위한 계산 과정을 따라가기 좋은 *유한 오토마타*(Finite Automata)
+
+문맥자유언어(context-free language)를
+- 표현하기 좋은 *문맥자유문법*(context-free grammar, CFG)
+- 인식/생성하기 위한 계산 과정을 따라가기 좋은 *Pushdown Automata* (PDA)
+
+문맥자유문법(CFG)에 나타나는 심볼(symbol, 글자)의 종류
+- 단말(terminal) ~~~ $a,b,... in Sigma$
+  - 지금까지 FA에서도 다루던 입력 심볼
+- 변수(variable), 비단말(non-terminal) ~~~~ $A,B,C,... in V$ (다른 교재는 $V$대신 $N$을 쓰기도)
+  - 문법 규칙에만 등장. 즉, 생성 과정에서만 사용되고 최종 문자열에는 나타나지 않음
+
+CFG는 $(V, Sigma, R, S)$로 정의됨.
+- $V$: 변수들의 집합
+- $Sigma$: 단말들의 집합
+- $R$: 문법 규칙(production 또는 substitution rule 이라고도함)들의 집합
+- $S$: 시작 변수
+
+#pagebreak()
+CNF(Chomsky Normal Form)
+- 모든 문법 규칙이 다음 두 가지 형태 중 하나임
+  0. $S -> epsilon$ 은 예외적으로 허용되며, 이런 경우 S가 다른 규칙의 오른쪽에 등장할 수 없음
+  1. $A -> B C$ ($A, B, C$는 변수)
+  2. $A -> a$ ($A$는 변수, $a$는 단말)
+
+GNF(Greibach Normal Form) 우리 교재 말고 다른 교재에 등장
+- 모든 문법 규칙이 다음 형태를 가짐
+  0. $S -> epsilon$ 은 예외적으로 허용되며, 이런 경우 S가 다른 규칙의 오른쪽에 등장할 수 없음
+  1. $A -> a alpha$ ($A$는 변수, $a$는 단말, $alpha$는 변수들의 문자열)
+
+
+모든 CFG를 CNF로 변환할 수 있고, 또 GNF로도 변환할 수 있음이 알려져 있음. \
+빈 문자열을 포함하지 않는 언어의 경우에는 위의 0번이 필요치 않음.
+
+#pagebreak()
+
+*푸시다운 오토마타(PDA)*
+- 간단히 말하면 PDA = NFA + 스택(stack)
+- $(Q, Sigma, Gamma, delta, q_0, F)$로 정의됨.
+  - $Q$, $Sigma$, $q_0$, $F$는 NFA와 마찬가지
+  - $Gamma$: 스택 알파벳
+  - $delta$: 전이 관계 $Q times Sigma_epsilon times Gamma_epsilon times (Q times Gamma_epsilon)$ \
+    FA와 달리
+      - 입력 심볼뿐만 아니라 스택의 최상단 심볼을 읽고
+      - 다음에 어느 상태로 갈지 뿐만 아니라 스택의 최상단 심볼을 어떻게 바꿀지도 결정
+
+~ 
+다른 교재에서는 전이관계를 $delta: Q times Sigma_epsilon times Gamma times (Q times Gamma^*)$ 이렇게 정의 하기도
+- 우리 교재 정의는 한번의 전이(화살표)로 인한 스택의 크기 변화 최대 1씩만
+  - 정규화된 CFG의 규칙을 대응시킬 수 있음
+- 다른 요 정의는 한번의 전이로 스택의 크기 변화가 한번에 크게 일어나는 것 허용
+  - 정규화되지 않은 CFG의 규칙을 한번에 하나의 전이로 처리하기 편함
 // #pagebreak()
 // #heading(level: 1, numbering: none)[다음 장]
+
+
+
+
+
+
+
+
+
+
+
+
