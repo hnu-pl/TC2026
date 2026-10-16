@@ -83,7 +83,58 @@
 #set text(font: font-serif, size: 12pt, lang: "ko", region: "KR")
 #show raw: set text(font: font-mono, size: 10.5pt, ligatures: false)
 
+
 ///////////////////////////////////////////////////////////////////
+#heading(level: 1, numbering: none)[HW03 TODO]
+- 이름: 
+- 학번: 
+#v(0.5em)
+
+Prolog DCG Example 1
+#code(file: "tc26hw03test.pl")[```prolog
+'A' --> [a], 'A'.
+'A' --> [b].
+
+?- phrase('A', [a]).
+?- phrase('A', [a,b]).
+?- phrase('A', [a,a,a,b]).
+?- phrase('A', [a,a,a,b,b]).
+```]
+
+
+Prolog DCG Example 2
+#code(file: "tc26hw03test2.pl")[```prolog
+'A' --> [0], 'A', [1].
+'A' --> 'B'.
+'B' --> [x].
+
+?- phrase('A', [0,1]).
+?- phrase('A', [0,x,1]).
+?- phrase('A', [0,0,0,x,1,1,1]).
+?- phrase('A', [0,0,0,x,1,1,1,1]).
+```]
+
+Prolog DCG Example 3
+#code(file: "tc26hw03test3.pl")[```prolog
+'S' --> [a], 'S', [b].
+'S' --> 'S', 'S'.
+'S' --> [].
+
+?- phrase('S', [a,b,a,b]).
+% ?- phrase('S', [a,b,a,a,b,b]).
+% ?- phrase('S', [a,b]).
+% ?- phrase('S', [a,a,b]).
+% ?- phrase('S', [a,a,b,b]).
+```]
+
+
+
+
+#pagebreak()
+
+
+///////////////////////////////////////////////////////////////////
+/* 
 #heading(level: 1, numbering: none)[HW02 NFA로 문자열 인식]
 - 이름: 
 - 학번: 
@@ -92,7 +143,7 @@
 #heading(level: 2, numbering: none)[주교재 Figure 1.30]
 $epsilon$이 없는 NFA에서 문자열 인식
 
-#code(file: "TC26hw02Fig1dot30.pl")[```prolog
+#code(file: "tc26hw02fig1dot30.pl")[```prolog
 ?- atom_chars('abac', CS),
    atom_chars(Str, ['a','b','c']),
    format('atom_chars 실행 예시 ~w ~w ~n', [CS, Str]).
@@ -185,8 +236,7 @@ recog_chars(CS,     Q) :- true.     % true 대신 여기에 코드 작성.
 ?- true,                    % 이 줄의 true 대신 적절한 첫째 쿼리 작성
    format('~w ~w!~n', ['2nd','result']). % 적절한 형식으로 결과 출력
 ```]
-
-
+********************* */
 
 /**********
 ///////////////////////////////////////////////////////////////////
@@ -571,6 +621,62 @@ cons(X,Xs,[X|Xs]).
 ```]
 그런데 어차피 멱집합으로부터 역산할 일은 실제로는 거의 없기 때문에 \
 실용적으로는 어떻게 구현하는 보통은 상관없음
+
+
+== 확정절 문법(Definite Clause Grammar) <DCG>
+우리 교재의 CFG를 Prolog의 DCG로 옮기면 실행할 수 있다.
+
+두 개의 문법 규칙 $A --> a A$와 $A --> b$를
+DCG로 옮겨 실행해 보면 다음과 같다.
+#code(file: "DCGexample1.pl")[```prolog
+'A' --> [a], 'A'.
+'A' --> [b].
+
+?- L = [a],
+   ( phrase('A', L) -> format('~w 수락.~n',[L]); format('~w 거부.~n',[L]) ).
+?- L = [a,b],
+   ( phrase('A', L) -> format('~w 수락.~n',[L]); format('~w 거부.~n',[L]) ).
+?- L = [a,a,a,b],
+   ( phrase('A', L) -> format('~w 수락.~n',[L]); format('~w 거부.~n',[L]) ).
+?- L = [a,a,a,b,b],
+   ( phrase('A', L) -> format('~w 수락.~n',[L]); format('~w 거부.~n',[L]) ).
+```]
+
+#pagebreak()
+주교재 2장에 처음 나오는 CFG 문법 규칙을 Prolog의 DCG로 옮겨서 실행해 보면 다음과 같다.
+#code(file: "DCGexample2.pl")[```prolog
+'A' --> [0], 'A', [1].
+'A' --> 'B'.
+'B' --> [x]. % 교재의 # 대신 x 로
+
+?- L = [0,1],
+   ( phrase('A', L) -> format('~w 수락.~n',[L]); format('~w 거부.~n',[L]) ).
+?- L = [0,x,1],
+   ( phrase('A', L) -> format('~w 수락.~n',[L]); format('~w 거부.~n',[L]) ).
+?- L = [0,0,0,x,1,1,1],
+   ( phrase('A', L) -> format('~w 수락.~n',[L]); format('~w 거부.~n',[L]) ).
+?- L = [0,0,0,x,1,1,1,1],
+   ( phrase('A', L) -> format('~w 수락.~n',[L]); format('~w 거부.~n',[L]) ).
+```]
+
+#pagebreak()
+하지만 교재의 문법 규칙들 중에는 그대로 옮기면 무한 재귀로 인해
+스택 오버플로우가 발생하는 경우도 있다.
+#code(file: "DCGexample3.pl")[```prolog
+'S' --> [a], 'S', [b].
+'S' --> 'S', 'S'.      % 이것 때문에 stack overflow 발생 가능
+'S' --> [].
+
+?- phrase('S', [a,b,a,b]).
+% ?- phrase('S', [a,b,a,a,b,b]).
+% ?- phrase('S', [a,b]).
+% ?- phrase('S', [a,a,b]).
+% ?- phrase('S', [a,a,b,b]).
+```]
+
+
+
+
 
 //////////////////////////////////////////////////////////////////
 #pagebreak()
@@ -1568,6 +1674,12 @@ GNF(Greibach Normal Form) 우리 교재 말고 다른 교재에 등장
 모든 CFG를 CNF로 변환할 수 있고, 또 GNF로도 변환할 수 있음이 알려져 있음. \
 빈 문자열을 포함하지 않는 언어의 경우에는 위의 0번이 필요치 않음.
 
+
+~
+
+수업시간에 GNF 형태의 문법 규칙 하나를 여러 개의 CNF 형태의 문법 규칙들로 변환하는 예시를 다룸.
+수업시간의 기억을 더듬어 $A -> a B_1 B_2 B_3$를 여러 개의 CNF 규칙들로 변환해 보라.
+
 #pagebreak()
 
 *푸시다운 오토마타(PDA)*
@@ -1590,13 +1702,30 @@ GNF(Greibach Normal Form) 우리 교재 말고 다른 교재에 등장
 // #heading(level: 1, numbering: none)[다음 장]
 
 
+#pagebreak()
+수업시간에 CNF 문법규칙을 어떻게 PDA에서 실행시키는지 다루긴 했으나,
+사실 좀더 거쳐가는 중간과정이 많은데, 지난 수업시간에는 정말 대략적인 느낌만 다룸.
 
+이번에는 좀더 구체적으로 단계를 밟가가며 CNF 문법 규칙을 PDA에서 실행시켜 보자.
 
+$A --> a$ 규칙 처리 과정 (수업시간엔 이걸 화살표 하나처럼 대충 설명했음)
 
+$#circle(radius: .8em, align(center+horizon)[$q_1$])$ ~~ `입력: __a???   스택:[A|...]` \
+#h(.5em) $arrow.b epsilon, A -> a$
+#h(7em) expand (스택 가장 위에서, 문법규칙 왼쪽 $A$를 오른쪽 $a$로 치환) \
+$#circle(radius: .8em, align(center+horizon)[$q_2$])$ ~~ `입력: __a???   스택:[a|...]` \
+#h(.5em) $arrow.b a, a -> epsilon$
+#h(7.5em) match (스택의 최상단 심볼 a와 입력 심볼 a가 일치하여 소비됨) \
+$#circle(radius: .8em, align(center+horizon)[$q_3$])$ ~~ `입력: ___???   스택:  [...]`
+#v(1em)
 
+$D --> B C$ 규칙 처리 과정 (이건 수업시간에 다룬 그대로 expand가 여러 단계에 걸쳐 일어남)
 
+$#circle(radius: .8em, align(center+horizon)[$q_4$])$ ~~ `입력: __????   스택:  [D|...]` \
+#h(.5em) $arrow.b epsilon, D -> C$ \
+$#circle(radius: .8em, align(center+horizon)[$q_5$])$ ~~ `입력: __a???   스택:  [C|...]` \
+#h(.5em) $arrow.b a, epsilon -> B$ \
+$#circle(radius: .8em, align(center+horizon)[$q_6$])$ ~~ `입력: ___???   스택:[B|C|...]`
+#v(1em)
 
-
-
-
-
+이게 소위 말하는 CFG를 Top-Down 방식으로 PDA에서 실행시키는 과정의 예시
