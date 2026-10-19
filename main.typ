@@ -675,9 +675,11 @@ DCG로 옮겨 실행해 보면 다음과 같다.
 ```]
 
 #pagebreak()
-놀랍게도 여기서도 테이블링 마법이 통한다!!!
+놀랍게도 여기서도 테이블링 마법이 통한다!!! \
+이게 왜 되는지 이해하려 노력하면 많은 깨달음이 있을 것이다.
 #code(file: "DCGexample4.pl")[```prolog
-:- table 'S'/2.
+:- table 'S'/2.   %% DCG의 hidden parameter 2개이므로
+% :- table 'S'//0.  %% DCG 전용 테이블링 문법 rule_name//k 는 rule_name/k+2 에 해당
 'S' --> [a], 'S', [b].
 'S' --> 'S', 'S'.      % 이것 때문에 stack overflow 발생 가능
 'S' --> [].
@@ -1668,6 +1670,11 @@ DFA $-->$ GNFA $-->$ RegEx 변환 과정
 - 변수(variable), 비단말(non-terminal) ~~~~ $A,B,C,... in V$ (다른 교재는 $V$대신 $N$을 쓰기도)
   - 문법 규칙에만 등장. 즉, 생성 과정에서만 사용되고 최종 문자열에는 나타나지 않음
 
+왼쪽이 같은 CFG 규칙끼리 묶어서 오른쪽에 여러 개의 선택지를 $mid(|)$로 구분하여
+나열하는 방식의 마치 하나의 규칙처럼 압축해 표현하는 축약 표기법.
+예를 들면 우리 교재 2장 첫번째 CFG 문법 규칙 예제의
+두개의 문법 규칙을 이러한 축약 표기법으로 $S --> 1 S 0 mid(|) mathtt("#")$
+
 #pagebreak()
 CFG는 $G=(V, Sigma, R, S)$ 이렇게 4-tuple로 정의됨.
 - $V$: 변수들의 집합
@@ -1774,9 +1781,86 @@ NFA에 해당하는 부분(즉, 교재 그림 2.22의 control)의 상태가 몇 
 $delta: Q times Sigma_epsilon times Gamma times (Q times Gamma^*)$ 형식의
 전이 관계에 해당하는 개념을 설명을 위한 도구로 사용하는 것이라 볼 수 있다.
 
+*그림 2.23*: CFG의 문법규칙 하나를 PDA에서 실행시키는 과정을 그림으로 설명
+  - 왼쪽: CFG의 문법규칙 하나를 PDA의 $q_"loop"$상태에서 출발해서 다시 돌아오는 경로 하나로 요약 (다른 교재의 한꺼번에 스택에 여러 개를 쌓는 전이 단계를 허용하는 버전의 PDA라면 실제로 이 화살표 하나가 구체적인 전이 단계 하나에 해당)
+  - 오른쪽: 우리 교재의 PDA 정의에 충실하게 중간 단계 상태들을 거치며 한번에 하나의
+    변수만 스택에 쌓으며 $q_"loop"$으로 돌아오는 여러 단계의 전이 과정을 자세히 표현
+
+*그림 2.24*는 가장 중요한 3개의 상태들을 중심으로 CFG를 top-down 방식으로 실행시키는 PDA의 전체적인 구조를 개략적으로 요약하여 보여주는 그림
+
+*그림 2.25*: CFG를 top-down 방식으로 실행시키는 PDA의 전체 구조를 CFG규칙 expand과정의 중간 단계까지 하나하나 나열하며 match 과정 전이까지 모두 완전하게 보여주는 예시 그림
+
+그림 2.24와 2.25에서 $mathtt("$")in Gamma$는 스택의 밑바닥 끝임을 나타내는 심볼(기호, 글자)
+#pagebreak()
 #code(file: "pda_naive.pl")[```prolog
-% TODO
+% PDA definition for top-down execution of CFG rules:
+%     (1) S -> 0S1       (2) S -> x
+state(q_start). state(q_s2l). state(q_loop). state(q_l2a). state(q_accept).
+state(q_1__1). state(q_1_S1).  % Q (states)
+sigma(0). sigma(1). sigma(x).  % Σ
+gamma('$').    gamma('S').    gamma(X) :- sigma(X).        % Γ
+% 수식으로 된 수학적 정의보다는 PDA 전이도(그림)의 구조와 맞게 delta 작성
+delta(q_start, [],    []-['$'], q_s2l).
+delta(q_s2l,   [],    []-['S'], q_loop).
+delta(q_loop,  [], ['S']-[ 1 ], q_1__1).  % rule (1) __1
+delta(q_loop,  [],    []-['S'], q_1_S1).  % rule (1) _S1
+delta(q_loop,  [],    []-[ 0 ], q_loop).  % rule (1) 0S1, back to q_loop
+delta(q_loop,  [], ['S']-[ x ], q_loop).  % rule (2) 
+delta(q_loop, [A], [ A ]-[],    q_loop) :- sigma(A).  % terminal symbol match
+delta(q_l2a,   [], ['$']-[],    q_accept).
+
+?- delta(q_start, [], S1-S2, Q2), delta(Q2, [], S3-S4, Q3),
+   format("~w ~w ~w ~w~n", [S1-S2, Q2, S3-S4, Q3]).
+?- delta(q_loop, [], ['S']-[1], Q2), delta(Q2, [], S3-S4, Q3),
+   format("~w ~w ~w ~w~n", [['S']-[1], Q2, S3-S4, Q3]).
 ```]
+
+#code(file: "pda_naive.pl")[```prolog
+% delta(Q1, A, S1-S2, Q2) 형식 검사 위한 helper predicates 
+sigmaE([A]) :- sigma(A).  sigmaE([]).
+gammaE([X]) :- gamma(X).  gammaE([]).
+% every Q1 and Q2 is a state
+?- findall(Q1, delta(Q1,_,_,_), QS), maplist(state, QS).
+?- findall(Q2, delta(_,_,_,Q2), QS), maplist(state, QS).
+% every X are either a singleton alphabet symbol list or the empty list
+?- findall(A,  delta(_,A,_,_), AS), maplist(sigmaE, AS).
+% every S1 and S2 is either a singleton stack symbol list or the empty list
+?- findall(S1, delta(_,_,S1-_,_), SS), maplist(gammaE, SS).
+?- findall(S2, delta(_,_,_-S2,_), SS), maplist(gammaE, SS).
+
+% delta를 여러 번에 걸쳐 계속 진행시키는 과정을 나타내는 predicate
+steps(Q1, W1, S1, Q2, W2, S2) :- fail. % TODO fail 대신 내용 작성
+
+runPDA(Input) :- steps(q_start, Input, ['$'], q_accept, [], _).
+```]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
