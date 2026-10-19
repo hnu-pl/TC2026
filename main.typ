@@ -674,6 +674,21 @@ DCG로 옮겨 실행해 보면 다음과 같다.
 % ?- phrase('S', [a,a,b,b]).
 ```]
 
+#pagebreak()
+놀랍게도 여기서도 테이블링 마법이 통한다!!!
+#code(file: "DCGexample4.pl")[```prolog
+:- table 'S'/2.
+'S' --> [a], 'S', [b].
+'S' --> 'S', 'S'.      % 이것 때문에 stack overflow 발생 가능
+'S' --> [].
+
+?- phrase('S', [a,b,a,b]).
+?- phrase('S', [a,b,a,a,b,b]).
+?- phrase('S', [a,b]).
+?- phrase('S', [a,a,b]).
+?- phrase('S', [a,a,b,b]).
+```]
+
 
 
 
@@ -1642,8 +1657,9 @@ DFA $-->$ GNFA $-->$ RegEx 변환 과정
 - 표현하기 좋은 *정규식*(regular expression, regex)
 - 인식하기 위한 계산 과정을 따라가기 좋은 *유한 오토마타*(Finite Automata)
 
-문맥자유언어(context-free language)를
+문맥자유언어(context-free language, CLF)를
 - 표현하기 좋은 *문맥자유문법*(context-free grammar, CFG)
+  - 사실 CFL이 바로 이런 문법(CFG)으로 생성할 수 있는 언어로 정의됨!!
 - 인식/생성하기 위한 계산 과정을 따라가기 좋은 *Pushdown Automata* (PDA)
 
 문맥자유문법(CFG)에 나타나는 심볼(symbol, 글자)의 종류
@@ -1652,11 +1668,28 @@ DFA $-->$ GNFA $-->$ RegEx 변환 과정
 - 변수(variable), 비단말(non-terminal) ~~~~ $A,B,C,... in V$ (다른 교재는 $V$대신 $N$을 쓰기도)
   - 문법 규칙에만 등장. 즉, 생성 과정에서만 사용되고 최종 문자열에는 나타나지 않음
 
-CFG는 $(V, Sigma, R, S)$로 정의됨.
+#pagebreak()
+CFG는 $G=(V, Sigma, R, S)$ 이렇게 4-tuple로 정의됨.
 - $V$: 변수들의 집합
 - $Sigma$: 단말들의 집합
 - $R$: 문법 규칙(production 또는 substitution rule 이라고도함)들의 집합
 - $S$: 시작 변수
+
+
+$u => v$는 문자열 $u$에 어떤 한 문법 규칙에 따라 하나의 변수를
+치환(substitution)함으로써 문자열 $v$를 유도할 수 있음을 나타냄.
+(여기서 $u, v in V union Sigma$) \
+이렇게 화살표 하나가 나타내는 것을 유도(derivation) 과정의 한 단계(step)라고도 말함.
+
+$u =>_G v$와 같이 $G$라는 CFG의 유도 단계(derivation step)임을 강조하기 위해
+#v(-.3em) 화살표 아래에 CFG의 이름을 적어 표기하기도 함.
+
+CFG인 $G$로 정의되는 CFL을
+$L(G) = { thin w in Sigma^* mid(|) S scripts(=>)^* w thin }$
+이렇게 표현할 수 있다. \
+(즉, 0회 이상의 유도 단계를 거쳐 시작 변수로부터 유도되는 단말 문자열의 집합)
+
+
 
 #pagebreak()
 CNF(Chomsky Normal Form)
@@ -1704,9 +1737,9 @@ GNF(Greibach Normal Form) 우리 교재 말고 다른 교재에 등장
 
 #pagebreak()
 수업시간에 CNF 문법규칙을 어떻게 PDA에서 실행시키는지 다루긴 했으나,
-사실 좀더 거쳐가는 중간과정이 많은데, 지난 수업시간에는 정말 대략적인 느낌만 다룸.
+사실 한 두 단계 거쳐가는 중간과정이 있는데, 지난 수업시간에는 정말 대략적인 느낌만 다룸.
 
-이번에는 좀더 구체적으로 단계를 밟가가며 CNF 문법 규칙을 PDA에서 실행시켜 보자.
+여기서는 좀더 구체적으로 단계를 밟가가며 CNF 문법 규칙을 PDA에서 실행시켜 보자.
 
 $A --> a$ 규칙 처리 과정 (수업시간엔 이걸 화살표 하나처럼 대충 설명했음)
 
@@ -1728,4 +1761,22 @@ $#circle(radius: .8em, align(center+horizon)[$q_5$])$ ~~ `입력: __a???   스�
 $#circle(radius: .8em, align(center+horizon)[$q_6$])$ ~~ `입력: ___???   스택:[B|C|...]`
 #v(1em)
 
-이게 소위 말하는 CFG를 Top-Down 방식으로 PDA에서 실행시키는 과정의 예시
+#pagebreak()
+방금 이전 장의 설명이 소위 말하는 CFG를 Top-Down 방식으로 PDA에서 실행시키는 과정
+
+그런데 지금까지 설명에서는 CFG를 보고 PDA를 구성할 때
+NFA에 해당하는 부분(즉, 교재 그림 2.22의 control)의 상태가 몇 개 필요한지,
+어떻게 구성하는지가 명확히 설명되지는 않음.
+
+그 부분을 설명하는 것이 바로 교재 그림 2.23, 2.24, 2.26
+
+그림 2.23, 2.24를 보면 우리 교재도 사실상 다른 교재 PDA의
+$delta: Q times Sigma_epsilon times Gamma times (Q times Gamma^*)$ 형식의
+전이 관계에 해당하는 개념을 설명을 위한 도구로 사용하는 것이라 볼 수 있다.
+
+#code(file: "pda_naive.pl")[```prolog
+% TODO
+```]
+
+
+
