@@ -1788,16 +1788,15 @@ $delta: Q times Sigma_epsilon times Gamma times (Q times Gamma^*)$ 형식의
 
 *그림 2.24*는 가장 중요한 3개의 상태들을 중심으로 CFG를 top-down 방식으로 실행시키는 PDA의 전체적인 구조를 개략적으로 요약하여 보여주는 그림
 
-*그림 2.25*: CFG를 top-down 방식으로 실행시키는 PDA의 전체 구조를 CFG규칙 expand과정의 중간 단계까지 하나하나 나열하며 match 과정 전이까지 모두 완전하게 보여주는 예시 그림
+*그림 2.26*: CFG를 top-down 방식으로 실행시키는 PDA의 전체 구조를 CFG규칙 expand과정의 중간 단계까지 하나하나 나열하며 match 과정 전이까지 모두 완전하게 보여주는 예시 그림
 
-그림 2.24와 2.25에서 $mathtt("$")in Gamma$는 스택의 밑바닥 끝임을 나타내는 심볼(기호, 글자)
+그림 2.24와 2.26에서 $mathtt("$")in Gamma$는 스택의 밑바닥 끝임을 나타내는 심볼(기호, 글자)
 #pagebreak()
 #code(file: "pda_naive.pl")[```prolog
-% PDA definition for top-down execution of CFG rules:
-%     (1) S -> 0S1       (2) S -> x
-state(q_start). state(q_s2l). state(q_loop). state(q_l2a). state(q_accept).
-state(q_1__1). state(q_1_S1).  % Q (states)
-sigma(0). sigma(1). sigma(x).  % Σ
+% (1) S -> 0S1  (2) S -> x  두 CFG 규칙의 top-down 방식 PDA 
+state(q_start). state(q_s2l). state(q_loop). state(q_accept).
+state(q_1__1). state(q_1_S1).                              % Q (states)
+sigma(0). sigma(1). sigma(x).                              % Σ
 gamma('$').    gamma('S').    gamma(X) :- sigma(X).        % Γ
 % 수식으로 된 수학적 정의보다는 PDA 전이도(그림)의 구조와 맞게 delta 작성
 delta(q_start, [],    []-['$'], q_s2l).
@@ -1807,7 +1806,7 @@ delta(q_loop,  [],    []-['S'], q_1_S1).  % rule (1) _S1
 delta(q_loop,  [],    []-[ 0 ], q_loop).  % rule (1) 0S1, back to q_loop
 delta(q_loop,  [], ['S']-[ x ], q_loop).  % rule (2) 
 delta(q_loop, [A], [ A ]-[],    q_loop) :- sigma(A).  % terminal symbol match
-delta(q_l2a,   [], ['$']-[],    q_accept).
+delta(q_loop,  [], ['$']-[],    q_accept).
 
 ?- delta(q_start, [], S1-S2, Q2), delta(Q2, [], S3-S4, Q3),
    format("~w ~w ~w ~w~n", [S1-S2, Q2, S3-S4, Q3]).
@@ -1828,39 +1827,93 @@ gammaE([X]) :- gamma(X).  gammaE([]).
 ?- findall(S1, delta(_,_,S1-_,_), SS), maplist(gammaE, SS).
 ?- findall(S2, delta(_,_,_-S2,_), SS), maplist(gammaE, SS).
 
-% delta를 여러 번에 걸쳐 계속 진행시키는 과정을 나타내는 predicate
-steps(Q1, W1, S1, Q2, W2, S2) :- fail. % TODO fail 대신 내용 작성
-
+% delta를 0회 이상 여러 번에 걸쳐 계속 진행시키는 과정 (Q1,W1,S1)->...->(Q2,W2,S2)
+steps(Q1, W1, S1, Q2, W2, S2) :- fail.  % TODO 여기 fail 대신 내용 작성.
+                                        % 여러 규칙으로 나눠 작성해도 됨.
 runPDA(Input) :- steps(q_start, Input, ['$'], q_accept, [], _).
 ```]
 
+#pagebreak()
+교재 2장의 CFL, CFG, PDA 관련해 이후로 나오는 내용들을 따라 공부하려 할 때 막히는 부분.
 
+(비결정적) PDA를 먼저 배움 (이론적으로 간단하고 수학적 성질도 증명하기 좋으므로)
+- CFG를 top-down 방식으로 실행하는 PDA <== 지금까지 교재를 따라가며 열심히 다룸
+- CFG를 bottom-up 방식으로 실행하는 PDA ??? 이게 보통 교재들에 직접 등장을 안하는 경향
 
+나중에 파서(parser) 알고리즘 관련해 정적 버전의 PDA인 DPDA에 대해 다루면서
+- 대략 top-down 방식 DPDA 동작에 대응되는 LL 파서  <== 우리 교재에서 안다룸
+- 대략 bottom-up 방식 DPDA 동작에 해당하는 LR 파서 <== ??? 우리 교재에서 다룸 ???
+이런 개념들을 접하는데 ...
 
+하향(top-down)식 (비결정적) PDA 동작 원리를 알고 있으면 LL 파서 이해에 도움이 됨. 
+근데 이건 우리 교재에서는 안다룸. 문법분석(parsing) 자체를 주제로 한 책이나
+파서의 대표적 활용 분야인 컴파일러를 주제로 하는 교재에서 다룸.
 
+상향(bottom-up)식 (비결정적) PDA 동작 원리를 알고 있으면 LR 파서 이해에 도움이 됨.  \
+(비결정적 PDA가 더 간단한 근본 형태이고 결정적 PDA는 그 위에 제약을 추가한 셈이기 때문) \
+근데 우리 교재 포함 여러 다른 교재에도 이 부분이 비어 있어서, 상향식 PDA를 상상하고
+그게 rightmost deriviation과 관련이 있음을 스스로 책을 보고 깨우쳐치면 이해가 확 트이는
+느낌이고 안그러면 뭔가 너무 갑자기 많은 디테일을 다루는 느낌을 받아 혼란스러울 수 있음.
 
+그래서 여기서 우래 교재에 직접적으로 소개되지 않은 bottom-up 방식의 (비결정적) PDA
+동작 원리를 알아보는 간단한 예시를 정리하면 도움이 될 것이라 생각됨.
 
+#pagebreak()
+(1) $S -> 0 S 1$  (2) $S -> x$ 문법규칙들로 구성된 CFG에 대한 두 방식의 비결정적 PDA 실행 예시를 비교/대조.
+상태(state)는 생략하고 입력과 스택을 중심으로만 ...
 
+- Top-down 방식 (스택을 왼쪽으로 눕혀 왼쪽이 top인 형태. `||`는 바닥을 표시)
+```
+0x1     [S,$]||   ⊢ ⋯ ⊢     expand (1) 
+0x1 [0,S,1,$]||   ⊢         match 0       
+_x1   [S,1,$]||   ⊢         expand (2)
+_x1   [x,1,$]||   ⊢         match x
+__1     [1,$]||   ⊢         match 1
+___       [$]||   ⊢
+___        []||
+```
+만약 $S -> A B$ 같이 두 개 이상의 변수로 확장되는 경우,
+왼쪽이 스택 top쪽이니 먼저 가장 왼쪽 $A$부터 처리하게 됨.
+이는 CFG의 leftmost derivation에 대응되며, LL 파서가 이런 흐름을 따름.
 
+- Bottom-up 방식 (스택을 오른쪽으로 눕혀 오른쪽이 top인 형태. `||`는 바닥을 표시)
+```
+0x1 ||[$]         ⊢         shift 0
+_x1 ||[$,0]       ⊢         shift x
+__1 ||[$,0,x]     ⊢         reduce by (2)
+__1 ||[$,0,S]     ⊢         shift 1
+___ ||[$,0,S,1]   ⊢ ⋯ ⊢     reduce by (1)
+___ ||[$,S]       ⊢   
+___ ||[$]         ⊢   
+___ ||[]
+```
 
+#pagebreak()
+문법규칙의 오른편에 두 개 이상의 변수가 있는 경우를 살펴보자.
 
+(1) $S -> A B$ \
+(2) $A -> a b$ \
+(3) $B -> c d e$
+```
+abcde ||[$]           ⊢        shift a
+_bcde ||[$,a]         ⊢        shift b
+__cde ||[$,a,b]       ⊢ ⋯ ⊢    reduce by (2)
+__cde ||[$,A]         ⊢        shift c
+___de ||[$,A,c]       ⊢        shift d
+____e ||[$,A,c,d]     ⊢        shift e
+_____ ||[$,A,c,d,e]   ⊢ ⋯ ⊢    reduce by (3)
+_____ ||[$,A,B]       ⊢ ⋯ ⊢    reduce by (1)
+_____ ||[$,S]         ⊢
+_____ ||[$]           ⊢   
+_____ ||[]
+```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+PDA의 실행 시간 순서상으로는 왼쪽의 $A$가 먼저 처리되지만,
+bottom-up 방식은 derivation을 역순으로 진행시키고 있음에 유의!!!
+결과적으로 전체 derivation을 표준적인 방향으로 작성하면 
+$S => A B =>  A c d e => a b c d e$ 이므로 derivation의 정방향
+진행 순서상으로는 오른쪽의 $B$부터 처리되는 rightmost derivation에 해당하며,
+LR 파서가 바로 rightmost derivation에 따라 작동.
 
 
 
