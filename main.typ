@@ -90,47 +90,112 @@
 - 학번: 
 #v(0.5em)
 
-Prolog DCG Example 1
-#code(file: "tc26hw03test.pl")[```prolog
-'A' --> [a], 'A'.
-'A' --> [b].
+#heading(level: 2, numbering: none)[1. CFG를 top-down PDA로]
+(1) $S -> 0 S 1$  (2) $S -> x$ 두 규칙의 CFG를 top-down 방식의 PDA로 작성하고 테스트.
+#code(file: "tc26hw03a.pl")[```prolog
+state(q_start). state(q_s2l).                  % Q (states)
+state(q_loop). state(q_1__1). state(q_1_S1).   state(q_accept). 
+sigma(0).   sigma(1).   sigma(x).               % Σ (terminal symbols)
+gamma('$').  gamma('S').  gamma(X) :- sigma(X). % Γ (stack symbols)
+% 수식으로 된 수학적 정의보다는 PDA 전이도(그림)의 구조와 맞게 delta 작성
+delta(q_start, [],    []-['$'], q_s2l).
+delta(q_s2l,   [],    []-['S'], q_loop).
+delta(q_loop,  [], ['S']-[ 1 ], q_1__1).  % rule (1) __1
+delta(q_loop,  [],    []-['S'], q_1_S1).  % rule (1) _S1
+delta(q_loop,  [],    []-[ 0 ], q_loop).  % rule (1) 0S1, back to q_loop
+delta(q_loop,  [], ['S']-[ x ], q_loop).  % rule (2) 
+delta(q_loop, [A], [ A ]-[],    q_loop) :- sigma(A).  % match terminal
+delta(q_loop,  [], ['$']-[],    q_accept).
+% delta(Q1, A, S1-S2, Q2) 형식 검사 위한 helper predicates 
+sigmaE([A]) :- sigma(A).  sigmaE([]).
+gammaE([X]) :- gamma(X).  gammaE([]).
+% every Q1 and Q2 is a state
+?- findall(Q1, delta(Q1,_,_,_), QS), maplist(state, QS).
+?- findall(Q2, delta(_,_,_,Q2), QS), maplist(state, QS).
+% every X are either a singleton alphabet symbol list or the empty list
+?- findall(A,  delta(_,A,_,_), AS), maplist(sigmaE, AS).
+% every S1 and S2 is either a singleton stack symbol list or the empty list
+?- findall(S1, delta(_,_,S1-_,_), SS), maplist(gammaE, SS).
+?- findall(S2, delta(_,_,_-S2,_), SS), maplist(gammaE, SS).
 
-?- phrase('A', [a]).
-?- phrase('A', [a,b]).
-?- phrase('A', [a,a,a,b]).
-?- phrase('A', [a,a,a,b,b]).
+% delta를 0회 이상 여러 번에 걸쳐 계속 진행시키는 과정 (Q1,W1,S1)->...->(Q2,W2,S2)
+steps(Q1, W1, S1, Q2, W2, S2) :- true.  % TODO 여기 true 대신 내용 작성.
+                                        % 필요하면 여러 규칙으로 나눠 작성
+
+runPDA(Input) :- steps(q_start, Input, ['$'], q_accept, [], _).
+
+% ?- runPDA(...), ... . % 적절한 방식으로 runPDA 테스트 및 결과 출력 1
+% ?- runPDA(...), ... . % 적절한 방식으로 runPDA 테스트 및 결과 출력 2
+% ?- runPDA(...), ... . % 적절한 방식으로 runPDA 테스트 및 결과 출력 3
 ```]
-
-
-Prolog DCG Example 2
-#code(file: "tc26hw03test2.pl")[```prolog
-'A' --> [0], 'A', [1].
-'A' --> 'B'.
-'B' --> [x].
-
-?- phrase('A', [0,1]).
-?- phrase('A', [0,x,1]).
-?- phrase('A', [0,0,0,x,1,1,1]).
-?- phrase('A', [0,0,0,x,1,1,1,1]).
-```]
-
-Prolog DCG Example 3
-#code(file: "tc26hw03test3.pl")[```prolog
-'S' --> [a], 'S', [b].
-'S' --> 'S', 'S'.
-'S' --> [].
-
-?- phrase('S', [a,b,a,b]).
-% ?- phrase('S', [a,b,a,a,b,b]).
-% ?- phrase('S', [a,b]).
-% ?- phrase('S', [a,a,b]).
-% ?- phrase('S', [a,a,b,b]).
-```]
-
-
-
 
 #pagebreak()
+
+#heading(level: 2, numbering: none)[2. CFG를 bottom-up PDA로]
+(1) $S -> 0 S 1$  (2) $S -> x$ 두 규칙의 CFG를 bottom-up 방식의 PDA로 작성하고 테스트.
+#code(file: "tc26hw03b.pl")[```prolog
+state(q_start).
+state(q_loop). state(q_l2a).
+state(q_accept).
+% TODO 위 4개 외에 다른 필요한 state들 여기에 추가       % Q (states)
+sigma(0).   sigma(1).   sigma(x).                   % Σ (terminal symbols)
+gamma('$').    gamma('S').    gamma(X) :- sigma(X). % Γ (stack symbols)
+% 수식으로 된 수학적 정의보다는 PDA 전이도(그림)의 구조와 맞게 delta 작성
+delta(q_start, [],    []-['$'], q_loop).
+delta(q_loop, [A],    []-[ A ], q_loop) :- sigma(A).  % shift terminal
+% delta(...)  % TODO 적절한 reduce 관련 전이들 작성
+% delta(...)  % 그 외에 다른 필요한 전이가 있다면 작성
+delta(q_loop,  [], ['S']-[],    q_l2a).
+delta(q_l2a,   [], ['$']-[],    q_accept).
+
+% delta(Q1, A, S1-S2, Q2) 형식 검사 위한 helper predicates 
+sigmaE([A]) :- sigma(A).  sigmaE([]).
+gammaE([X]) :- gamma(X).  gammaE([]).
+% every Q1 and Q2 is a state
+?- findall(Q1, delta(Q1,_,_,_), QS), maplist(state, QS).
+?- findall(Q2, delta(_,_,_,Q2), QS), maplist(state, QS).
+% every X are either a singleton alphabet symbol list or the empty list
+?- findall(A,  delta(_,A,_,_), AS), maplist(sigmaE, AS).
+% every S1 and S2 is either a singleton stack symbol list or the empty list
+?- findall(S1, delta(_,_,S1-_,_), SS), maplist(gammaE, SS).
+?- findall(S2, delta(_,_,_-S2,_), SS), maplist(gammaE, SS).
+
+% delta를 0회 이상 여러 번에 걸쳐 계속 진행시키는 과정 (Q1,W1,S1)->...->(Q2,W2,S2)
+steps(Q1, W1, S1, Q2, W2, S2) :- true.  % TODO 여기 true 대신 내용 작성.
+                                        % 필요하면 여러 규칙으로 나눠 작성
+
+runPDA(Input) :- steps(q_start, Input, ['$'], q_accept, [], _).
+
+% ?- runPDA(...), ... . % 적절한 방식으로 runPDA 테스트 및 결과 출력 1
+% ?- runPDA(...), ... . % 적절한 방식으로 runPDA 테스트 및 결과 출력 2
+% ?- runPDA(...), ... . % 적절한 방식으로 runPDA 테스트 및 결과 출력 3
+```]
+
+#pagebreak()
+#heading(level: 2, numbering: none)[3. CFG를 무한루프를 회피하는 bottom-up PDA로 구현]
+CFG를 bottom-up 방식의 PDA로 곧이곧대로 Prolog로 옮겨 작성하면 무한루프로 인해
+스택 오버플로가 발행할 수 있는 경우의 CFG를 제시하고, 이를 Prolog 실행시 회피하기 방법을
+추가하여 작성하고 테스트하라. 최대한 2번의 문제에 제시된 코드 틀을 되도록 그대로 따르면서
+필요한 부분만 코드의 구조에 변경을 가하여 작성하라.
+#code(file: "tc26hw03c.pl")[```prolog
+% TODO 여기에 코드 작성 
+```]
+
+#pagebreak()
+#heading(level: 2, numbering: none)[4. DCG로 작성한 문법규칙이 문자열을 수락하며 문법분석나무도 생성]
+이 문서의 "Prolog 소개"의 확정절 문법을 다루는 절에서 DCGExample3.pl을 시작으로 변경하여 작성하라.
+#code(file: "tc26hw03d.pl")[```prolog
+% TODO 여기에 코드 작성 
+```]
+
+#pagebreak()
+#heading(level: 2, numbering: none)[5. Top-down PDA로 작성한 Prolog 코드에서도 문법분석나무 생성]
+앞의 문제의 CFG를 이번에는 top-down 방식 또는 bottom-up 방식의 PDA 중 하나로 구현하면서
+문자열을  인식하는 과정에서 문법분석나무도 함께 생성하도록 작성하라.
+PDA 실행 과정에 대한 기록을 로그로 남겨서 문자열을 수락하고 난 다음 별도의 단계에서 문법분석나무를 생성하지 말고 PDA 실행 과정에서 같이 점차적으로 생성되도록 하되 Prolog의 논리 변수를 적절히 활용하라.
+#code(file: "tc26hw03e.pl")[```prolog
+% TODO 여기에 코드 작성 
+```]
 
 
 ///////////////////////////////////////////////////////////////////
@@ -1633,9 +1698,9 @@ DFA $-->$ GNFA $-->$ RegEx 변환 과정
     - 새로운 수락 상태를 만들고
     - 기존 수락 상태들에서 $epsilon$전이 화살표로 연결
     - 기존 수락 상태들은 더 이상 수락 상태가 아닌 것으로 처리
-      #v(1em)
-+ 다음과 같이 상태, 화살표를 줄이는 과정을 반복 #v(.5em)
-  - $q_1 -->^(R_1) q_2 -->^(R_2) q_3 $를 ~~~~ $q_1 xarrow(thick R_1 thin R_2 thick) q_3 $ 로 줄임. #v(1em)  (상태도 줄어들고 화살표도 줄어들고)
+
++ 다음과 같이 상태, 화살표를 줄이는 과정을 반복 #v(0em)
+  - $q_1 -->^(R_1) q_2 -->^(R_2) q_3 $를 ~~~~ $q_1 xarrow(thick R_1 thin R_2 thick) q_3 $ 로 줄임. (상태도 줄어들고 화살표도 줄어들고) #v(.7em)
   - $q_1 -->^(R_1) q_2$와 $q_1 -->^(R_2) q_2 $를 ~~~~ $q_1 xarrow(thick R_1 union R_2 thick) q_2 $ 로 줄임. (화살표만 줄어듦)#v(1em)
   - $q_1 -->^(R_1) q_2 #box(baseline: 1em)[#h(-1em)$arrow.ccw_(R_2)$] #h(-.1em) -->^(R_3) q_3 $를 ~~~~ $q_1 xarrow(thick R_1 thin R_2^* thin R_3 thick thick) q_3 $ 로 줄임. (상태도 줄어들고 화살표도 줄어들고) #v(1em)
 
@@ -1736,7 +1801,7 @@ GNF(Greibach Normal Form) 우리 교재 말고 다른 교재에 등장
 다른 교재에서는 전이관계를 $delta: Q times Sigma_epsilon times Gamma times (Q times Gamma^*)$ 이렇게 정의 하기도
 - 우리 교재 정의는 한번의 전이(화살표)로 인한 스택의 크기 변화 최대 1씩만
   - 정규화된 CFG의 규칙을 대응시킬 수 있음
-- 다른 요 정의는 한번의 전이로 스택의 크기 변화가 한번에 크게 일어나는 것 허용
+- 다른 교재의 그런 정의는 한번의 전이로 스택의 크기 변화가 한번에 크게 일어나는 것 허용
   - 정규화되지 않은 CFG의 규칙을 한번에 하나의 전이로 처리하기 편함
 // #pagebreak()
 // #heading(level: 1, numbering: none)[다음 장]
@@ -1805,7 +1870,7 @@ delta(q_loop,  [], ['S']-[ 1 ], q_1__1).  % rule (1) __1
 delta(q_loop,  [],    []-['S'], q_1_S1).  % rule (1) _S1
 delta(q_loop,  [],    []-[ 0 ], q_loop).  % rule (1) 0S1, back to q_loop
 delta(q_loop,  [], ['S']-[ x ], q_loop).  % rule (2) 
-delta(q_loop, [A], [ A ]-[],    q_loop) :- sigma(A).  % terminal symbol match
+delta(q_loop, [A], [ A ]-[],    q_loop) :- sigma(A).  % match terminal
 delta(q_loop,  [], ['$']-[],    q_accept).
 
 ?- delta(q_start, [], S1-S2, Q2), delta(Q2, [], S3-S4, Q3),
@@ -1828,7 +1893,7 @@ gammaE([X]) :- gamma(X).  gammaE([]).
 ?- findall(S2, delta(_,_,_-S2,_), SS), maplist(gammaE, SS).
 
 % delta를 0회 이상 여러 번에 걸쳐 계속 진행시키는 과정 (Q1,W1,S1)->...->(Q2,W2,S2)
-steps(Q1, W1, S1, Q2, W2, S2) :- fail.  % TODO 여기 fail 대신 내용 작성.
+steps(Q1, W1, S1, Q2, W2, S2) :- true.  % TODO 여기 true 대신 내용 작성.
                                         % 여러 규칙으로 나눠 작성해도 됨.
 runPDA(Input) :- steps(q_start, Input, ['$'], q_accept, [], _).
 ```]
@@ -1864,7 +1929,7 @@ runPDA(Input) :- steps(q_start, Input, ['$'], q_accept, [], _).
 
 - Top-down 방식 (스택을 왼쪽으로 눕혀 왼쪽이 top인 형태. `||`는 바닥을 표시)
 ```
-0x1     [S,$]||   ⊢ ⋯ ⊢     expand (1) 
+0x1     [S,$]||   ⊢ ⋯ ⊢     expand (1)  자잘한 중간 상태 2개를 거쳐서
 0x1 [0,S,1,$]||   ⊢         match 0       
 _x1   [S,1,$]||   ⊢         expand (2)
 _x1   [x,1,$]||   ⊢         match x
@@ -1882,7 +1947,7 @@ ___        []||
 _x1 ||[$,0]       ⊢         shift x
 __1 ||[$,0,x]     ⊢         reduce by (2)
 __1 ||[$,0,S]     ⊢         shift 1
-___ ||[$,0,S,1]   ⊢ ⋯ ⊢     reduce by (1)
+___ ||[$,0,S,1]   ⊢ ⋯ ⊢     reduce by (1)  자잘한 중간 상태 2개를 거쳐서
 ___ ||[$,S]       ⊢   
 ___ ||[$]         ⊢   
 ___ ||[]
@@ -1914,6 +1979,11 @@ bottom-up 방식은 derivation을 역순으로 진행시키고 있음에 유의!
 $S => A B =>  A c d e => a b c d e$ 이므로 derivation의 정방향
 진행 순서상으로는 오른쪽의 $B$부터 처리되는 rightmost derivation에 해당하며,
 LR 파서가 바로 rightmost derivation에 따라 작동.
+
+
+
+
+
 
 
 
