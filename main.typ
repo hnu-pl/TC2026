@@ -124,9 +124,9 @@ steps(Q1, W1, S1, Q2, W2, S2) :- true.  % TODO 여기 true 대신 내용 작성.
 
 runPDA(Input) :- steps(q_start, Input, ['$'], q_accept, [], _).
 
-% ?- runPDA(...), ... . % 적절한 방식으로 runPDA 테스트 및 결과 출력 1
-% ?- runPDA(...), ... . % 적절한 방식으로 runPDA 테스트 및 결과 출력 2
-% ?- runPDA(...), ... . % 적절한 방식으로 runPDA 테스트 및 결과 출력 3
+% ?- runPDA(...), ... . % TODO 적절한 방식으로 runPDA 테스트 및 결과 출력 1
+% ?- runPDA(...), ... . % TODO 적절한 방식으로 runPDA 테스트 및 결과 출력 2
+% ?- runPDA(...), ... . % TODO 적절한 방식으로 runPDA 테스트 및 결과 출력 3
 ```]
 
 #pagebreak()
@@ -160,15 +160,18 @@ gammaE([X]) :- gamma(X).  gammaE([]).
 ?- findall(S1, delta(_,_,S1-_,_), SS), maplist(gammaE, SS).
 ?- findall(S2, delta(_,_,_-S2,_), SS), maplist(gammaE, SS).
 
+% TODO 수동으로 몇 단계에 걸쳐 delta를 연쇄적으로 이어붙인 전이과정 확인용 예시 작성
+% ?- delta(...),...,delta(...),...,format(...). % 이렇게 수업노트에 나온 것처럼 
+
 % delta를 0회 이상 여러 번에 걸쳐 계속 진행시키는 과정 (Q1,W1,S1)->...->(Q2,W2,S2)
 steps(Q1, W1, S1, Q2, W2, S2) :- true.  % TODO 여기 true 대신 내용 작성.
                                         % 필요하면 여러 규칙으로 나눠 작성
 
 runPDA(Input) :- steps(q_start, Input, ['$'], q_accept, [], _).
 
-% ?- runPDA(...), ... . % 적절한 방식으로 runPDA 테스트 및 결과 출력 1
-% ?- runPDA(...), ... . % 적절한 방식으로 runPDA 테스트 및 결과 출력 2
-% ?- runPDA(...), ... . % 적절한 방식으로 runPDA 테스트 및 결과 출력 3
+% ?- runPDA(...), ... . % TODO 적절한 방식으로 runPDA 테스트 및 결과 출력 1
+% ?- runPDA(...), ... . % TODO 적절한 방식으로 runPDA 테스트 및 결과 출력 2
+% ?- runPDA(...), ... . % TODO 적절한 방식으로 runPDA 테스트 및 결과 출력 3
 ```]
 
 #pagebreak()
@@ -177,6 +180,21 @@ CFG를 bottom-up 방식의 PDA로 곧이곧대로 Prolog로 옮겨 작성하면 
 스택 오버플로가 발행할 수 있는 경우의 CFG를 제시하고, 이를 Prolog 실행시 회피하기 방법을
 추가하여 작성하고 테스트하라. 최대한 2번의 문제에 제시된 코드 틀을 되도록 그대로 따르면서
 필요한 부분만 코드의 구조에 변경을 가하여 작성하라.
+
+무한루프를 실제로 발생시켜 스택 오버플로를 출력할 필요는 없고, 회피하는 구현만 작성하면 된다.
+
+단, 제시한 CFG에서 왜 무한루프가 발생하게 되는지 여기에 일반 텍스트 및 수식으로 설명하라.
+
++ 구현할 CFG 규칙들을 아래에 작성 (4튜플 형태로 작성할 필요 없고 간단히 문법 들만 작성)
+  ```
+  S -> ... TODO
+  . -> ... TODO
+  ```
++ 무한루프로 진행하는 과정을 간단히 요약한 예시를 들면서,
+  너무 길지 않게 무한루프 발생하는 이유를 간결하게 핵심만 설명 \
+
+  TODO 여기에 설명 작성
+
 #code(file: "tc26hw03c.pl")[```prolog
 % TODO 여기에 코드 작성 
 ```]
@@ -184,6 +202,10 @@ CFG를 bottom-up 방식의 PDA로 곧이곧대로 Prolog로 옮겨 작성하면 
 #pagebreak()
 #heading(level: 2, numbering: none)[4. DCG로 작성한 문법규칙이 문자열을 수락하며 문법분석나무도 생성]
 이 문서의 "Prolog 소개"의 확정절 문법을 다루는 절에서 DCGExample3.pl을 시작으로 변경하여 작성하라.
+
+이 문제는 Prolog의 항(term)이 트리 구조를 나타낸다는 것을 분명히 이해하고 활용할 수 있어야 한다.
+이 개념이 이해가 안간다면 강의노트 Prolog 소개의 관련 부분도 다시 읽어보고 LLM 챗봇 서비스를 활용하여
+Prolog의 항(term)이 트리 구조를 나타낸다는 원리에 대해 질문해 보며 먼저 그 개념을 확실히 하고 넘어가야 한다.
 #code(file: "tc26hw03d.pl")[```prolog
 % TODO 여기에 코드 작성 
 ```]
@@ -192,7 +214,9 @@ CFG를 bottom-up 방식의 PDA로 곧이곧대로 Prolog로 옮겨 작성하면 
 #heading(level: 2, numbering: none)[5. Top-down PDA로 작성한 Prolog 코드에서도 문법분석나무 생성]
 앞의 문제의 CFG를 이번에는 top-down 방식 또는 bottom-up 방식의 PDA 중 하나로 구현하면서
 문자열을  인식하는 과정에서 문법분석나무도 함께 생성하도록 작성하라.
-PDA 실행 과정에 대한 기록을 로그로 남겨서 문자열을 수락하고 난 다음 별도의 단계에서 문법분석나무를 생성하지 말고 PDA 실행 과정에서 같이 점차적으로 생성되도록 하되 Prolog의 논리 변수를 적절히 활용하라.
+PDA 실행 과정에 대한 기록을 로그로 남겨서 문자열을 수락하고 난 다음 별도의 단계에서
+문법분석나무를 생성하지 말고 PDA 실행 과정에서 같이 점차적으로 생성되도록 하되
+Prolog의 논리 변수를 적절히 활용하라. 앞의 4번 문제의 PDA버전을 작성하라는 문제이다.
 #code(file: "tc26hw03e.pl")[```prolog
 % TODO 여기에 코드 작성 
 ```]
@@ -1903,9 +1927,9 @@ runPDA(Input) :- steps(q_start, Input, ['$'], q_accept, [], _).
 
 (비결정적) PDA를 먼저 배움 (이론적으로 간단하고 수학적 성질도 증명하기 좋으므로)
 - CFG를 top-down 방식으로 실행하는 PDA <== 지금까지 교재를 따라가며 열심히 다룸
-- CFG를 bottom-up 방식으로 실행하는 PDA ??? 이게 보통 교재들에 직접 등장을 안하는 경향
+- CFG를 bottom-up 방식으로 실행하는 PDA ??? 이게 보통 교재들에 직접 등장을 안하는 경향 (Linz 책 최신판에는 부록 비슷하게 뒤에 추가된 장에 등장함)
 
-나중에 파서(parser) 알고리즘 관련해 정적 버전의 PDA인 DPDA에 대해 다루면서
+나중에 파서(parser) 알고리즘 관련해 결정적 버전의 PDA인 DPDA에 대해 다루면서
 - 대략 top-down 방식 DPDA 동작에 대응되는 LL 파서  <== 우리 교재에서 안다룸
 - 대략 bottom-up 방식 DPDA 동작에 해당하는 LR 파서 <== ??? 우리 교재에서 다룸 ???
 이런 개념들을 접하는데 ...
@@ -1954,7 +1978,7 @@ ___ ||[]
 ```
 
 #pagebreak()
-문법규칙의 오른편에 두 개 이상의 변수가 있는 경우를 살펴보자.
+문법규칙 오른편에 변수가 둘 이상인 경우 bottom-up 방식 PDA 실행/계산/전이 과정 예시
 
 (1) $S -> A B$ \
 (2) $A -> a b$ \
@@ -1974,16 +1998,37 @@ _____ ||[]
 ```
 
 PDA의 실행 시간 순서상으로는 왼쪽의 $A$가 먼저 처리되지만,
-bottom-up 방식은 derivation을 역순으로 진행시키고 있음에 유의!!!
+bottom-up 방식은 derivation을 시간을 거꾸로 되감아 돌리듯 역순으로 진행시키고 있음에 유의!!!
 결과적으로 전체 derivation을 표준적인 방향으로 작성하면 
 $S => A B =>  A c d e => a b c d e$ 이므로 derivation의 정방향
 진행 순서상으로는 오른쪽의 $B$부터 처리되는 rightmost derivation에 해당하며,
-LR 파서가 바로 rightmost derivation에 따라 작동.
+LR 파서가 이런 방식으로 작동.  우리 교재에서는 derivation의 역방향을 reduction이라는 이름을 붙여서 다루고 있음.
+그러니까 $a b c d e  arrow.r.tail
+ A c d e    arrow.r.tail
+ A B        arrow.r.tail S$ 이걸 leftmost reduction으로 부름.
 
 
+#pagebreak()
+Deterministic CFG (DCFG)와 Deterministic PDA (DPDA)
 
+용어 정의
+/ DCFL: DPDA로 인식/판별 가능한 언어
+/ DPDA: $delta$가 비결정적으로 한 단계 전이 후 여러 상황에 대응 가능한 일반적인 관계(relation) 형태가 아니라
+        다음 상태와 스택 변화가 유일하게 하나로 결정되도록 $delta$가 전이 함수(function)
+/ DCFG:
+  CFG가 표현하는 언어에 속하는 모든 문자열에 대한 leftmost reduction, 즉,
+  시작 변수로 축소에 성공하는 leftmost reduction 과정이 항상 결정적인 CFG.
+  (언어에 속하는 문자열로 시작하는 가장 왼쪽부터 축소 과정의 매 단계에서
+  적용 가능한 규칙이 항상 하나뿐이라는 말)
 
+DCFG의 정의 자체만로는 결정적 문법분석 알고리즘의 존재를 당연하게 확신하기는 곤란.
+왜냐하면 언어에 속하지 않는 문자열의 (결과적으로 시작 변수로 축소되지 않는)
+leftmost reduction까지도 항상 결정적이라는 조건은 정의에 포함되지 않기 때문.
+문법분석 알고리즘은 주어진 문자열이 언어에 속하는지 미리 알고 돌리는 게 아니니까 ...
 
+그래서 큰 줄기의 스토리는 DPDA랑 DCFG가 쌤쌤이라는 ...
+
+그러니까 DCFG의 형태인지 검사하면 문법분석 알고리즘을 결정적으로 설계 가능하다는 결론
 
 
 
