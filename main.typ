@@ -2019,7 +2019,8 @@ Deterministic CFG (DCFG)와 Deterministic PDA (DPDA)
   CFG가 표현하는 언어에 속하는 모든 문자열에 대한 leftmost reduction, 즉,
   시작 변수로 축소에 성공하는 leftmost reduction 과정이 항상 결정적인 CFG.
   (언어에 속하는 문자열로 시작하는 가장 왼쪽부터 축소 과정의 매 단계에서
-  적용 가능한 규칙이 항상 하나뿐이라는 말)
+  적용 가능한 규칙이 항상 하나뿐이라는 말) \
+  정의는 forced handle이라는 조금 더 세부적인 개념을 사용해서 정의하는데 대략의 느낌은 이렇다.
 
 DCFG의 정의 자체만로는 결정적 문법분석 알고리즘의 존재를 당연하게 확신하기는 곤란.
 왜냐하면 언어에 속하지 않는 문자열의 (결과적으로 시작 변수로 축소되지 않는)
@@ -2029,6 +2030,67 @@ leftmost reduction까지도 항상 결정적이라는 조건은 정의에 포함
 그래서 큰 줄기의 스토리는 DPDA랑 DCFG가 쌤쌤이라는 ...
 
 그러니까 DCFG의 형태인지 검사하면 문법분석 알고리즘을 결정적으로 설계 가능하다는 결론
+
+
+#pagebreak()
+DCFG 문법의 형태/성질 기준 문법분석 알고리즘 분류
+
+크게 LL계열과 LR계열로 분류하는데
+- 공통적인 첫 글자 L은 왼쪽에서부터 오른쪽으로 처리한다는 문자열 처리 방향
+- 둘째 글자는 문자열의 분석 과정을 derivation으로 나타냈을 때 Leftmost인지 Rightmost인지
+
+
+아래에서 k는 2이상의 정해진 자연수
+
+/ LL(0), LL(1), LL(k) 문법:
+  - Leftmost derivation으로 진행
+  - top-down 하향식, recursive decent 재귀하강 ... 그런 이름과 용어를 사용하는 파서로 주로 구현
+  - 0, 1, k개의 미리보기(lookahead) 심볼을 사용하여 결정적 파싱 가능  \
+    ${cal(L)(G) mid(|) G"는 LL(0)"} subset {cal(L)(G) mid(|) G"는 LL(1)"}
+     subset {cal(L)(G) mid(|) G"는 LL(k)"} subset "전체DCFL"$
+
+
+/ LR(0), LR(1), LR(k) 문법:
+  - Rightmost derivation으로 진행 (DPDA 실행 시간 순서로는 leftmost reduction)
+  - bottom-up 상향식, table driven, ... shift reduce ... 그런 이름과 용어를 사용하는 파서로 주로 구현
+  - 0, 1, k개의 미리보기(lookahead) 심볼을 사용하여 결정적 파싱 가능 \
+    ${cal(L)(G) mid(|) G"는 LR(0)"} subset {cal(L)(G) mid(|) G"는 LR(1)"}
+     = {cal(L)(G) mid(|) G"는 LR(k)"} = "전체DCFL"$
+
+그러니까 LR(1) 문법으로 모든 DCFL을 다 나타낼 수 있음.
+
+#pagebreak()
+#heading(level: 1, numbering: none)[주교재 3 처치--튜링 명제/논제/테제/가설]
+The Church--Turing Thesis는 "계산 가능"하다는 것이 무슨 의미인지 ... \
+즉, "계산"이란 무엇인지에 대한 정의를 제시
+(현명한 사람의 직관, 번뜩이는 아이디어, 경험적 지혜, 꿈에서 받은 계시 등에 전혀 의존하지 않고)
+고정된 규칙에 따라 누구나, 심지어 영혼 없는 기계에 시키기만 하면 자동으로 알아서 진행 가능한
+기계적인 "계산"이란 무엇인지
+설명하려는 다양한 모델들 중 대표적인 두 가지
+- Alonzo Church의 람다계산법(λ-calculus)
+- Alan Turing의 튜링 기계(Turing machine, 줄여서 TM)
+이 두 모델은 (그리고 몇몇 다른 모델들도) 서로 다른 사람들이 서로 다른 방식으로 시도했지만
+이들이 제시한 계산 가능성의 범위는 동일하다 ... 모두 다 쌤쌤이라는 것이 밝혀짐.
+
+그래서 이렇게 여러 훌륭한 천재적인 학자들이 독립적으로 시도한 결과가 동일하다면 아마도 \
+기계적 "계산"이라는 현상의 본질을 정확히 인류가 파악하게 된 것이라고 잠정적으로 받아들이고
+이것을 벗어나는 "계산"이라는 개념은 없을 것이라고 판단하고 있는 ... \
+이러한 명제/논제/테제/가설(thesis)을 "Church--Turing thesis"라고 함.
+
+흥미로운 역사적 사실
+- TM이 가장 먼저 나오고 그 다음 FA와 PDA 순으로 등장
+- Church는 Turing의 박사 지도교수였으며 람다계산법이 TM보먼 먼저 등장 \
+  (당시에는 인터넷이 없었으므로 미국과 영국에서 각자가 독자적으로 고안한 모델)
+
+
+
+#pagebreak()
+#heading(level: 2, numbering: none)[3.1 Turing Machines]
+PDA로 인식/처리 못하는, 즉 CFL이 아닌 대표적인 언어들
+- $a^k b^k c^k$ 처럼 세 부분의 길이(또는 반복 횟수)가 같은 걸 확인해야 하는 언어
+- $w\#w$ 처럼 정확히 같은 문자열이 정확히 같은 순서로 반복되는지 확인 (참고로, $w\#w^R$은 CFL)
+
+
 
 
 
