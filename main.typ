@@ -2086,11 +2086,122 @@ The Church--Turing Thesis는 "계산 가능"하다는 것이 무슨 의미인지
 
 #pagebreak()
 #heading(level: 2, numbering: none)[3.1 Turing Machines]
+그림 3.1은 조금 오해의 소지가 있다.
+오른쪽으로만 필요한 만큼 빈칸이 무한히 있는
+(또는 필요한 만큼 빈칸을 덧붙여 사용할 수 있는) 게 아니라
+왼쪽으로도 필요한 만큼 빈칸이 무한히 있어서,
+양쪽 방향으로 필요한 만큼 메모 공간을 얼마든지 더 많이 활용할 수 있다.
+
+
 PDA로 인식/처리 못하는, 즉 CFL이 아닌 대표적인 언어들
-- $a^k b^k c^k$ 처럼 세 부분의 길이(또는 반복 횟수)가 같은 걸 확인해야 하는 언어
-- $w\#w$ 처럼 정확히 같은 문자열이 정확히 같은 순서로 반복되는지 확인 (참고로, $w\#w^R$은 CFL)
+- $a^k b^k c^k$ 처이럼 세 부분의 길이(또는 반복 횟수)가 같은 걸 확인해야 하는 언어
+- $w mathtt(\#)w$ 처럼 정확히 같은 문자열이 정확히 같은 순서로 반복되는지 확인 (참고로, $w\#w^R$은 CFL)
 
 
 
+
+${thin w mathtt(\#)w mid(|) w in {0,1}^* thin}$을 처리 하는 TM이 바로
+우리 교재 3.1에서 처음 나오는 예제.
+
+$w mathtt(\#)w$ 언어 예제 관련 그림:
+- 그림 3.2: 이 언어를 TM으로 어떻게 처리하는지 몇몇 중간 과정을 보여줌
+- 그림 3.9: 상태 동그라미와 라벨된 화살표로 나타낸 TM의 전이도
+
+$w\#w$를 인식하는 TM의 설계도는 교재 그림 3.9에 정답이 나와 있지만,
+상태 이름이 그냥 $q_1,q_2,...,q_7$ 이렇게 일련번호로 붙어 있다.
+그래서 각 상태가 어떤 역할을 하는지 직관적으로 이해하기 어려울 수도 있어서
+상태에 조금 기억하기 쉬운 이름을 붙여가며 나타내 보겠다.
+
+
+우선 설명에 앞서 교재 그림 3.4의 표기법을 이해하고 그림 3.2에 적용해 보자.
+그림 3.4의 현재 상태 $q_7$와 "헤드"의 위치가 테잎의 5번째 글자에 있다는 정보를
+포함한 TM의 설정/진행상황(configuration)을 그림 대신 간단히 
+$1011 thin q_7 thin underline(0)1111$ 이렇게 표현.
+(밑줄은 $q_7$ 왼쪽이 아니라 오른쪽에 헤드가 있음을 강조하기 위해
+여기에만 표시한 것이고 책이나 앞으로 노트에서는 쓰지 않음)
+
+
+#pagebreak()
+그림 3.2에 나오는 첫 4개의 TM 설정/진행상황(configuration)을 간단한 표기로 하면
+- $q_S thick 011000 mathtt(\#)011000$
+- $mathtt("x") thick q_0 thick 11000 mathtt(\#)011000$
+- $mathtt("x")11000 mathtt(\#) thick q_L thick mathtt("x")11000$
+- $q_L thick mathtt("x")11000 mathtt(\#)mathtt("x")11000$
+
+상태 설명
+- $q_S$: 시작 start
+- $q_0$: 좌측에서 0을 보고 x표하고 오른쪽으로 이동중에 아직 #mathtt("#")를 못봄
+- $q'_0$: 좌측에서 0을 보고 x표하고 오른쪽으로 진행중에 #mathtt("#")를 보고 지나감 (#mathtt("x")가 아닌 글자가 나올때까지 진행)
+- $q_1$: 촤측에서 1을 보고 x표하고 왼쪽으로 이동중에 아직 #mathtt("#")를 못봄
+- $q'_1$: 좌측에서 1을 보고 x표하고 왼쪽으로 진행중에 #mathtt("#")를 보고 지나감
+- $q_L$: 우측에 매칭되는 글자를 x표하고 왼쪽으로 진행중
+- $q_R$: 좌측에 더 이상 0이나 1이 남아있지 않고
+         x다음에 (또는 맨 처음부터) 바로 #mathtt("#")를 본 경우, \
+         ~~~~ 계속해서 오른쪽으로 이동하며 수락 상태로 갈 수 있는지 최종 확인중
+- $q_A$: 수락 accept
+- $q_"reject"$: 나락 상태 (전이함수 그림/표 등 설명이 복잡해지는 경우에 표시를 생략하기도)
+
+
+#pagebreak()
+이걸로 $01mathtt("#")01$을 처리하는 TM 진행 과정을 작성하면
+
+```
+qS 01#01   =R=>   x  q0 1#01
+           =R=>   x1  q0 #01 
+           =R=>   x1# q0' 01
+           =L=>   x1  qL #x1  
+           =L=>   x qL' 1#x1
+           =L=>    qL' x1#x1
+           =R=>   x  qS 1#x1 
+           =R=>   xx  q1 #x1
+           =R=>   xx# q1' x1
+           =R=>   xx#x q1' 1
+           =L=>   xx#  qL xx 
+           =L=>   xx  qL #xx
+           =L=>   x qL' x#xx
+           =R=>   xx  qS #xx
+           =R=>   xx#  qR xx
+           =R=>   xx#x  qR x
+           =R=>   xx#xx  qR ␣ 
+           =R=>   xx#xx␣  qA  
+```
+
+#pagebreak()
+
+아래 $delta : Q times Gamma -> Q times Gamma times {L,R}$의 정의에서
+- $alpha$는 0 또는 1
+- 나락 상태 관련 내용은 생략 
+
+#grid( columns: (1fr, 1fr, 1fr), align: top+center,
+[ #set math.equation(numbering: none)
+  $
+  delta(q_S,  0)           &= (q_0,  mathtt("x"), R) \
+  delta(q_0,  alpha)       &= (q_0,  alpha, R)       \
+  delta(q_0,  mathtt("#")) &= (q'_0, mathtt("#"), R) \
+  delta(q'_0, mathtt("x")) &= (q'_0, mathtt("x"), R) \
+  delta(q'_0, 0)           &= (q_L,  mathtt("x"), L) \ 
+  delta(q'_0, ␣)           &= (q_A,  ␣,           R) 
+  $ ],
+[ #set math.equation(numbering: none)
+  $
+  delta(q_S,  1)           &= (q_1,  mathtt("x"), R) \
+  delta(q_1,  alpha)       &= (q_1,  alpha, R)       \
+  delta(q_1,  mathtt("#")) &= (q'_1, mathtt("#"), R) \
+  delta(q'_1, mathtt("x")) &= (q'_1, mathtt("x"), R) \
+  delta(q'_1, 1)           &= (q_L,  mathtt("x"), L) \ 
+  delta(q'_1, ␣)           &= (q_A,  ␣,           R) 
+  $ ],
+[ #set math.equation(numbering: none)
+  $
+  delta(q_L,  mathtt("x")) &= (q_L,  mathtt("x"), L) \
+  delta(q_L,  mathtt("x")) &= (q_L,  mathtt("x"), L) \
+  delta(q_L,  mathtt("#")) &= (q'_L, mathtt("#"), L) \
+  delta(q'_L, alpha)       &= (q_S,  alpha,       L) \
+  delta(q'_L, mathtt("x")) &= (q_S,  mathtt("x"), R) \
+  delta(q_S,  mathtt("#")) &= (q_R,  mathtt("#"), R) \ 
+  delta(q_R,  mathtt("x")) &= (q_R,  mathtt("x"), R) \
+  delta(q_R,  ␣)           &= (q_A,  ␣,           R) 
+  $ ]
+)
 
 
